@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
+import { SoDuCard } from '@/components/balance/so-du-card'
 import { CotTrai } from '@/components/layout/cot-trai'
 import { PageHeader } from '@/components/layout/page-header'
 import { AmountSkeleton, CardLabel } from '@/components/ui/glass-card'
@@ -76,8 +77,10 @@ export default function ReportPage() {
         </div>
       </PageHeader>
 
+      <SoDuCard className="mt-6" />
+
       {/* Thu & chi theo tháng */}
-      <section className="mt-6 flex flex-col">
+      <section className="mt-8 flex flex-col">
         <div className="flex items-center justify-between gap-3">
           <CardLabel>Thu &amp; chi theo tháng</CardLabel>
           <div className="flex items-center gap-3.5 text-[11px] font-semibold text-muted">

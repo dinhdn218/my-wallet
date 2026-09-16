@@ -101,6 +101,40 @@ create table public.budgets (
 );
 
 
+-- ---------------------------------------------------------------------------
+-- balance_marks — mốc số dư
+--
+-- Một mốc = (thời điểm, số tiền THẬT SỰ có lúc đó). Số dư được suy ra:
+--   số dư tại T = mốc gần nhất trước T + Σthu − Σchi (giao dịch sau mốc, tới T)
+--
+-- Một khái niệm này phục vụ CẢ HAI việc: mốc đầu tiên là "số dư đầu kỳ", mốc
+-- thêm về sau là "đối soát". Mỗi lần đặt mốc mới, sai số tích luỹ do quên ghi
+-- bị cắt về 0 — đó là lý do bảng này tồn tại. Xem
+-- docs/superpowers/specs/2026-09-17-so-du-design.md.
+--
+-- ⚠️ amount_vnd KHÔNG có check > 0, khác transactions.amount_vnd. Bất biến
+-- "số tiền luôn dương" nói về GIAO DỊCH; số dư thì âm được thật khi đang nợ.
+--
+-- Khoá chính ghép khiến đặt mốc thành upsert idempotent: đặt lại mốc cùng thời
+-- điểm là SỬA, không tạo bản thứ hai.
+--
+-- Không có cột nào cho ví/ngân hàng: app gộp mọi nguồn thành một con số. Nhờ
+-- vậy chuyển tiền giữa các tài khoản của chính mình là vô hình — không phải
+-- thu, không phải chi, không cần loại giao dịch thứ ba. Nhất quán với việc đã
+-- gỡ account_id (migration 001).
+-- ---------------------------------------------------------------------------
+create table public.balance_marks (
+  user_id    uuid not null references auth.users (id) on delete cascade,
+  as_of      timestamptz not null,
+  amount_vnd bigint not null,
+  created_at timestamptz not null default now(),
+  primary key (user_id, as_of)
+);
+
+create index balance_marks_user_asof_idx
+  on public.balance_marks (user_id, as_of desc);
+
+
 -- ===========================================================================
 -- Row Level Security
 --
@@ -119,6 +153,7 @@ create table public.budgets (
 alter table public.categories   enable row level security;
 alter table public.transactions enable row level security;
 alter table public.budgets      enable row level security;
+alter table public.balance_marks enable row level security;
 
 -- categories
 create policy "categories: select own" on public.categories
@@ -151,6 +186,17 @@ create policy "budgets: update own" on public.budgets
   for update using ((select auth.uid()) = user_id)
               with check ((select auth.uid()) = user_id);
 create policy "budgets: delete own" on public.budgets
+  for delete using ((select auth.uid()) = user_id);
+
+-- balance_marks
+create policy "balance_marks: select own" on public.balance_marks
+  for select using ((select auth.uid()) = user_id);
+create policy "balance_marks: insert own" on public.balance_marks
+  for insert with check ((select auth.uid()) = user_id);
+create policy "balance_marks: update own" on public.balance_marks
+  for update using ((select auth.uid()) = user_id)
+              with check ((select auth.uid()) = user_id);
+create policy "balance_marks: delete own" on public.balance_marks
   for delete using ((select auth.uid()) = user_id);
 
 

@@ -289,6 +289,7 @@ describe('loadFromServer', () => {
       transactions: [tx({ id: 'srv_a' })],
       categories: [],
       budgets: {},
+      balanceMarks: [],
     })
 
     await useExpenseStore.getState().loadFromServer('u1')

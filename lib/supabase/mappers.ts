@@ -1,7 +1,13 @@
 import type { Category } from '@/lib/categories'
 import type { Budgets } from '@/lib/seed-data'
+import type { BalanceMark } from '@/types/balance'
 import type { Transaction, TxType } from '@/types/transaction'
-import type { BudgetRow, CategoryRow, TransactionRow } from './types'
+import type {
+  BalanceMarkRow,
+  BudgetRow,
+  CategoryRow,
+  TransactionRow,
+} from './types'
 
 /**
  * Ranh giới snake_case (Postgres) ↔ camelCase (app) DUY NHẤT. Mọi dòng đọc từ
@@ -50,4 +56,18 @@ export function rowsToBudgets(rows: BudgetRow[]): Budgets {
     ;(budgets[row.month] ??= {})[row.category_id] = Number(row.limit_vnd)
   }
   return budgets
+}
+
+/**
+ * ⚠️ `asOf` cũng phải chuẩn hoá về dạng Z như occurredAt: computeCurrentBalance
+ * so `t.occurredAt > mark.asOf` — nếu một bên là '+00:00' còn bên kia là '.000Z'
+ * thì so sánh chuỗi ra kết quả sai. Ở đây dùng so sánh mốc thời gian thật
+ * (Date.parse) nên an toàn hơn, nhưng vẫn giữ một định dạng duy nhất để hai
+ * chuỗi ISO trong app không bao giờ lẫn lộn hai dạng.
+ */
+export function rowToBalanceMark(row: BalanceMarkRow): BalanceMark {
+  return {
+    asOf: toIso(row.as_of),
+    amountVnd: Number(row.amount_vnd),
+  }
 }

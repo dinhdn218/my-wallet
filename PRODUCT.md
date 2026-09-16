@@ -52,6 +52,9 @@ lại là không quảng cáo, không gói trả phí, không tính năng thừa
   chưa có giao dịch nào dùng.
 - Hạn mức chi theo danh mục, theo tháng.
 - Báo cáo: so sánh tháng này với tháng trước, xu hướng nhiều tháng, chi lớn nhất.
+- **Số dư thật**, suy ra từ "mốc số dư" người dùng tự đặt (một con số gộp mọi
+  ví/ngân hàng/tiền mặt). Đặt mốc mới = đối soát, và app chỉ ra phần lệch giữa
+  sổ và đời thực để người dùng biết mình đã quên ghi khoảng bao nhiêu.
 
 **Bỏ trong bản thiết kế lại:**
 - **Nguồn tiền (Techcombank / Tiền mặt / Ví Momo) bị gỡ bỏ.** Không có số dư đầu
@@ -61,12 +64,15 @@ lại là không quảng cáo, không gói trả phí, không tính năng thừa
 - Vì bỏ nguồn tiền, "Tổng số dư" không còn nghĩa là tiền thật đang có. Số liệu
   chủ đạo phải là **dòng tiền trong tháng** (thu, chi, còn lại), không phải một
   con số "số dư" gây hiểu lầm.
+- Số dư thật được thêm lại về sau, nhưng theo cách khác hẳn: KHÔNG cộng dồn
+  `Σthu − Σchi` (sai số tích luỹ vĩnh viễn), mà suy ra từ mốc người dùng xác
+  nhận. Và nó ở màn Báo cáo, không chiếm chỗ con số chủ đạo của màn ghi.
 
 **Ràng buộc kỹ thuật:**
 - Next.js 16 (App Router), React 19, Tailwind v4, Zustand v5, Supabase, Recharts.
 - Server là nguồn sự thật; Zustand là cache của phiên. Store chỉ giữ dữ liệu
-  thô (`transactions`, `categories`, `budgets`, `activeMonth`); mọi con số khác
-  là selector tính lại — không có state nào chép sẵn số tổng.
+  thô (`transactions`, `categories`, `budgets`, `balanceMarks`, `activeMonth`);
+  mọi con số khác là selector tính lại — không có state nào chép sẵn số tổng.
 - Số tiền luôn dương; dấu suy ra từ `type`.
 - Bộ E2E Playwright bám `data-testid`; đổi layout phải giữ hoặc cập nhật chúng.
 

@@ -11,6 +11,7 @@ import type { Budgets } from '@/lib/seed-data'
 import { createClient } from '@/lib/supabase/client'
 import {
   FK_VIOLATION,
+  deleteBalanceMark,
   deleteBudget,
   deleteCategory,
   deleteTransaction,
@@ -18,11 +19,14 @@ import {
   insertTransaction,
   updateCategoryRow,
   updateTransactionRow,
+  upsertBalanceMark,
   upsertBudget,
 } from '@/lib/supabase/queries'
+import type { BalanceMark } from '@/types/balance'
 import type { NewTransaction, Transaction, TxType } from '@/types/transaction'
 
 export type { NewTransaction, Transaction, TxType }
+export type { BalanceMark }
 
 /** Hạn mức chi theo tháng: budgets["2026-09"]["an-uong"] = 5_000_000 */
 export type { Budgets }
@@ -43,6 +47,11 @@ interface ExpenseState {
   /** Danh mục sửa được (tên + màu) ở màn Danh mục. */
   categories: Category[]
   budgets: Budgets
+  /**
+   * Mốc số dư, MỚI NHẤT TRƯỚC. Số dư không được lưu — nó suy ra từ mốc gần
+   * nhất cộng dòng tiền kể từ đó. Xem computeCurrentBalance.
+   */
+  balanceMarks: BalanceMark[]
   /** Tháng đang xem, dạng "2026-09". Chỉ là view state, không lưu lên server. */
   activeMonth: string
   /**
@@ -77,6 +86,9 @@ interface ExpenseState {
 
   setBudget: (categoryId: CategoryId, limit: number, month?: string) => Promise<void>
   clearBudget: (categoryId: CategoryId, month?: string) => Promise<void>
+
+  setBalanceMark: (asOf: string, amountVnd: number) => Promise<void>
+  removeBalanceMark: (asOf: string) => Promise<void>
 }
 
 /**
@@ -107,6 +119,7 @@ export const useExpenseStore = create<ExpenseState>()(
       transactions: [],
       categories: [],
       budgets: {},
+      balanceMarks: [],
       activeMonth: SEED_ACTIVE_MONTH,
       hasHydrated: false,
       syncStatus: 'idle',
@@ -120,6 +133,7 @@ export const useExpenseStore = create<ExpenseState>()(
             transactions: snapshot.transactions,
             categories: snapshot.categories,
             budgets: snapshot.budgets,
+            balanceMarks: snapshot.balanceMarks,
             syncStatus: 'ready',
             hasHydrated: true,
           })
@@ -146,6 +160,7 @@ export const useExpenseStore = create<ExpenseState>()(
           transactions: [],
           categories: [],
           budgets: {},
+          balanceMarks: [],
           activeMonth: SEED_ACTIVE_MONTH,
           hasHydrated: false,
           syncStatus: 'idle',
@@ -251,6 +266,29 @@ export const useExpenseStore = create<ExpenseState>()(
           return { budgets: { ...s.budgets, [key]: rest } }
         })
       },
+
+      /**
+       * Đặt/sửa một mốc số dư. Upsert theo (user_id, as_of) nên đặt lại mốc
+       * cùng thời điểm là SỬA, không sinh mốc thứ hai.
+       */
+      setBalanceMark: async (asOf, amountVnd) => {
+        const userId = get().userId
+        if (!userId) throw new Error('Chưa đăng nhập')
+
+        await upsertBalanceMark(createClient(), userId, asOf, amountVnd)
+        set((s) => ({
+          // Giữ MỚI NHẤT TRƯỚC, khớp thứ tự fetchSnapshot trả về.
+          balanceMarks: [
+            ...s.balanceMarks.filter((m) => m.asOf !== asOf),
+            { asOf, amountVnd },
+          ].sort((a, b) => Date.parse(b.asOf) - Date.parse(a.asOf)),
+        }))
+      },
+
+      removeBalanceMark: async (asOf) => {
+        await deleteBalanceMark(createClient(), asOf)
+        set((s) => ({ balanceMarks: s.balanceMarks.filter((m) => m.asOf !== asOf) }))
+      },
     }),
     {
       name: 'vi-rieng/expenses',
@@ -264,6 +302,7 @@ export const useExpenseStore = create<ExpenseState>()(
         transactions: s.transactions,
         categories: s.categories,
         budgets: s.budgets,
+        balanceMarks: s.balanceMarks,
         // activeMonth là view state phía client, phải nằm lại đây để chọn tháng
         // xong tải lại trang vẫn giữ nguyên.
         activeMonth: s.activeMonth,
@@ -324,20 +363,125 @@ export function useMonthlySummary(month?: string): MonthlySummary {
   )
 }
 
+/* ---------------- Số dư suy ra từ mốc ---------------- */
+
+export interface BalanceAt {
+  /** Số dư suy ra tại thời điểm được hỏi. ÂM ĐƯỢC. */
+  amount: number
+  /** Mốc dùng làm gốc — để màn hình nói rõ "tính từ ngày nào". */
+  mark: BalanceMark
+}
+
 /**
- * Tổng chênh lệch thu-chi mọi thời điểm.
+ * Số dư tại một thời điểm = mốc gần nhất KHÔNG SAU thời điểm đó, cộng dòng
+ * tiền phát sinh giữa hai mốc thời gian.
  *
- * ⚠️ KHÔNG phải "tiền đang có": không có số dư đầu kỳ nên đây chỉ là tổng dẫn
- * xuất từ các khoản đã ghi. Vì vậy màn chính KHÔNG hiện con số này như một
- * "số dư" — nó chỉ dùng ở màn Báo cáo, có nhãn nói rõ.
+ * ⚠️ Chưa có mốc nào thì trả `null`, KHÔNG phải 0. Đây là toàn bộ lý do tính
+ * năng này tồn tại: `Σthu − Σchi` đếm từ một số 0 giả, và sai số của nó tích
+ * luỹ vĩnh viễn qua từng khoản quên ghi. Trả 0 sẽ bị màn hình vẽ ra thành một
+ * số dư trông như thật — đúng thứ nguyên tắc 2 của PRODUCT.md cấm.
+ *
+ * ⚠️ So sánh bằng Date.parse chứ không localeCompare trên chuỗi: ở đây trộn
+ * mốc thời gian từ hai bảng khác nhau, và so chuỗi chỉ đúng khi cả hai cùng
+ * một định dạng ISO. Mapper đã chuẩn hoá về 'Z', nhưng không nên phụ thuộc vào
+ * điều đó ở một phép so sánh mang tính số học.
+ *
+ * Giao dịch xảy ra ĐÚNG tại mốc bị loại (so sánh nghiêm ngặt): mốc là lời
+ * khẳng định "lúc đó tôi có đúng bấy nhiêu", nó đã bao hàm mọi thứ tại và
+ * trước nó. Cộng lại là tính hai lần.
  */
-export const useTotalBalance = () =>
-  useExpenseStore((s) =>
-    s.transactions.reduce(
-      (a, t) => a + (t.type === 'income' ? t.amountVnd : -t.amountVnd),
-      0,
-    ),
-  )
+export function computeCurrentBalance(
+  transactions: Transaction[],
+  marks: BalanceMark[],
+  at: string,
+): BalanceAt | null {
+  const atMs = Date.parse(at)
+
+  let base: BalanceMark | undefined
+  let baseMs = -Infinity
+  for (const m of marks) {
+    const ms = Date.parse(m.asOf)
+    if (ms <= atMs && ms > baseMs) {
+      base = m
+      baseMs = ms
+    }
+  }
+  if (!base) return null
+
+  let amount = base.amountVnd
+  for (const t of transactions) {
+    const ms = Date.parse(t.occurredAt)
+    if (ms > baseMs && ms <= atMs) {
+      amount += t.type === 'income' ? t.amountVnd : -t.amountVnd
+    }
+  }
+
+  return { amount, mark: base }
+}
+
+/**
+ * Chênh lệch khi đối soát: số người dùng nhập trừ đi số sổ sách suy ra.
+ *
+ * Âm = đã tiêu mà quên ghi. Dương = đã thu mà quên ghi.
+ *
+ * Trả `null` khi đây là mốc ĐẦU TIÊN — không có lịch sử nào để so, và bịa ra
+ * một con số chênh lệch lúc đó là vô nghĩa.
+ *
+ * ⚠️ Chỉ tính trên các mốc NẰM TRƯỚC `asOf`. Đặt lại mốc cùng thời điểm là
+ * sửa nó, nên phải so với những gì sổ suy ra từ lịch sử trước đó — so với
+ * chính con số đang bị thay thì luôn ra đúng bằng hiệu hai lần nhập, vô dụng.
+ */
+export function computeDrift(
+  transactions: Transaction[],
+  marks: BalanceMark[],
+  asOf: string,
+  amountVnd: number,
+): number | null {
+  const asOfMs = Date.parse(asOf)
+  const prior = marks.filter((m) => Date.parse(m.asOf) < asOfMs)
+  const computed = computeCurrentBalance(transactions, prior, asOf)
+  if (!computed) return null
+  return amountVnd - computed.amount
+}
+
+export interface SoDu {
+  /** null = chưa có mốc nào; màn hình phải mời đặt mốc thay vì hiện số. */
+  balance: BalanceAt | null
+  /** Thời điểm con số này nói tới, ISO. */
+  at: string
+  /** Tháng đang xem có phải tháng hiện tại không — đổi nhãn hiển thị. */
+  laThangNay: boolean
+}
+
+/**
+ * Mốc thời gian của số dư bám theo `activeMonth`, chặn trên bằng "bây giờ".
+ *
+ * activeMonth là nguồn sự thật cho mọi màn, nên xem tháng 8 phải thấy số dư
+ * CUỐI THÁNG 8, không phải số dư hôm nay — nếu không, con số sẽ mâu thuẫn với
+ * mọi con số khác trên cùng màn hình. Chặn trên vì số dư của tương lai là vô
+ * nghĩa: tháng này chưa hết thì "cuối tháng" chưa xảy ra.
+ */
+export function useSoDu(month?: string): SoDu {
+  const transactions = useExpenseStore((s) => s.transactions)
+  const balanceMarks = useExpenseStore((s) => s.balanceMarks)
+  const activeMonth = useExpenseStore((s) => s.activeMonth)
+  const key = month ?? activeMonth
+
+  return useMemo(() => {
+    const [year, m] = key.split('-').map(Number)
+    // Ngày 0 của tháng kế = ngày cuối tháng này, theo GIỜ ĐỊA PHƯƠNG — cùng
+    // quy ước gom tháng với monthKey(). Cắt chuỗi ISO ở đây sẽ lệch ở UTC+7.
+    const cuoiThang = new Date(year, m, 0, 23, 59, 59, 999)
+    const now = new Date()
+    const at = cuoiThang < now ? cuoiThang : now
+
+    return {
+      balance: computeCurrentBalance(transactions, balanceMarks, at.toISOString()),
+      at: at.toISOString(),
+      laThangNay: now.getFullYear() === year && now.getMonth() + 1 === m,
+    }
+  }, [transactions, balanceMarks, key])
+}
 
 export interface CategorySlice {
   categoryId: CategoryId
@@ -484,7 +628,11 @@ export function computeBudgetStatus(used: number, limit: number): BudgetStatus {
  *
  * Đây là câu hỏi người dùng muốn trả lời trong 2 giây đầu, và nó thay thế
  * "Tổng số dư" của bản cũ — vốn là một con số gây hiểu lầm vì không có số dư
- * đầu kỳ (xem useTotalBalance).
+ * đầu kỳ.
+ *
+ * Số dư THẬT giờ đã có (computeCurrentBalance, suy từ mốc người dùng đặt),
+ * nhưng nó vẫn ở màn Báo cáo chứ không lên đây: số dư không phải câu hỏi cần
+ * trả lời lúc đang đứng ở quán, và hai con số tiền cạnh nhau mời đọc nhầm.
  *
  * ⚠️ Khi CHƯA đặt hạn mức nào, `coHanMuc` = false và `conLai` vô nghĩa: màn
  * chính phải hiện "đã tiêu tháng này" thay vì một con số còn lại bịa ra.

@@ -41,12 +41,15 @@ export const queryMocks = {
   deleteCategory: vi.fn(async () => {}),
   upsertBudget: vi.fn(async () => {}),
   deleteBudget: vi.fn(async () => {}),
+  upsertBalanceMark: vi.fn(async () => {}),
+  deleteBalanceMark: vi.fn(async () => {}),
   // Chú thích kiểu trả về: thiếu nó thì vi.fn suy ra transactions: never[] và
   // mọi test muốn mockResolvedValueOnce một snapshot CÓ dữ liệu sẽ không biên dịch.
   fetchSnapshot: vi.fn(async (): Promise<Snapshot> => ({
     transactions: [],
     categories: [],
     budgets: {},
+    balanceMarks: [],
   })),
   countTransactions: vi.fn(async () => 0),
 }

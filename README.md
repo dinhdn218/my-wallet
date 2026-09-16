@@ -41,7 +41,7 @@ Next 16 chỉ cho một `next dev` mỗi thư mục.
 | `/giao-dich` | Danh sách + lọc theo loại/danh mục, sắp xếp, sửa & xoá |
 | `/ngan-sach` | Hạn mức chi theo danh mục, đặt/sửa/gỡ |
 | `/danh-muc` | Đổi tên và màu danh mục, xoá danh mục chưa dùng |
-| `/bao-cao` | So sánh tháng này với tháng trước |
+| `/bao-cao` | Số dư thật, so sánh tháng này với tháng trước |
 
 ## Cấu trúc
 
@@ -58,6 +58,7 @@ components/
   layout/     cột trái · header + tabbar mobile · bộ chọn tháng
   transaction/ghi nhanh (bàn phím số) · dòng giá · sửa giao dịch
   budget/     dòng hạn mức + vạch sơn tiến độ
+  balance/    số dư thật + đối soát mốc
   ui/         primitive shadcn + thẻ giá treo dây kẽm
 lib/          format tiền/ngày, danh mục, theme, tiện ích
 store/        một store Zustand + các selector
@@ -87,6 +88,13 @@ và màn hiện "đã tiêu tháng này" — KHÔNG bịa ra một con số còn
 
 **Nguồn tiền đã gỡ bỏ** khỏi type, store, form, schema. Xem
 `supabase/migrations/001-drop-account-id.sql`.
+
+**Số dư suy ra từ MỐC, không cộng dồn từ số 0.** Một mốc là "lúc đó tôi có
+đúng bấy nhiêu"; số dư = mốc gần nhất + dòng tiền kể từ đó. Mốc đầu tiên là số
+dư đầu kỳ, mốc thêm về sau là đối soát — và mỗi lần đối soát, sai số tích luỹ
+do quên ghi bị cắt về 0. Chưa có mốc nào thì KHÔNG hiện số dư. Số dư chỉ sống ở
+màn Báo cáo, màn chính vẫn là "còn tiêu được". Xem
+`docs/superpowers/specs/2026-09-17-so-du-design.md`.
 
 ## Vài quyết định đáng nhớ
 

@@ -31,3 +31,10 @@ export interface BudgetRow {
   limit_vnd: number
   updated_at: string
 }
+
+export interface BalanceMarkRow {
+  user_id: string
+  as_of: string
+  amount_vnd: number
+  created_at: string
+}

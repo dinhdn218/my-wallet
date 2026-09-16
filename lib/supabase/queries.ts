@@ -1,9 +1,20 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Category, CategoryId } from '@/lib/categories'
 import type { Budgets } from '@/lib/seed-data'
+import type { BalanceMark } from '@/types/balance'
 import type { NewTransaction, Transaction } from '@/types/transaction'
-import { rowToCategory, rowToTransaction, rowsToBudgets } from './mappers'
-import type { BudgetRow, CategoryRow, TransactionRow } from './types'
+import {
+  rowToBalanceMark,
+  rowToCategory,
+  rowToTransaction,
+  rowsToBudgets,
+} from './mappers'
+import type {
+  BalanceMarkRow,
+  BudgetRow,
+  CategoryRow,
+  TransactionRow,
+} from './types'
 
 /**
  * Mọi câu truy vấn Supabase nằm ở đây. Trả về type của app (camelCase), không
@@ -19,29 +30,37 @@ export interface Snapshot {
   transactions: Transaction[]
   categories: Category[]
   budgets: Budgets
+  /** Mới nhất trước — computeCurrentBalance dựa vào thứ tự này. */
+  balanceMarks: BalanceMark[]
 }
 
 /** Mã lỗi Postgres khi vi phạm khoá ngoại (xoá danh mục còn giao dịch). */
 export const FK_VIOLATION = '23503'
 
 export async function fetchSnapshot(supabase: SupabaseClient): Promise<Snapshot> {
-  const [transactions, categories, budgets] = await Promise.all([
+  const [transactions, categories, budgets, balanceMarks] = await Promise.all([
     supabase
       .from('transactions')
       .select('*')
       .order('occurred_at', { ascending: false }),
     supabase.from('categories').select('*').order('sort_order'),
     supabase.from('budgets').select('*'),
+    supabase
+      .from('balance_marks')
+      .select('*')
+      .order('as_of', { ascending: false }),
   ])
 
   if (transactions.error) throw transactions.error
   if (categories.error) throw categories.error
   if (budgets.error) throw budgets.error
+  if (balanceMarks.error) throw balanceMarks.error
 
   return {
     transactions: (transactions.data as TransactionRow[]).map(rowToTransaction),
     categories: (categories.data as CategoryRow[]).map(rowToCategory),
     budgets: rowsToBudgets(budgets.data as BudgetRow[]),
+    balanceMarks: (balanceMarks.data as BalanceMarkRow[]).map(rowToBalanceMark),
   }
 }
 
@@ -156,5 +175,27 @@ export async function deleteBudget(
     .delete()
     .eq('month', month)
     .eq('category_id', categoryId)
+  if (error) throw error
+}
+
+/**
+ * Đặt một mốc số dư. Upsert theo (user_id, as_of): đặt lại mốc cùng thời điểm
+ * là SỬA con số, không tạo mốc thứ hai — nhờ khoá chính ghép.
+ */
+export async function upsertBalanceMark(
+  supabase: SupabaseClient,
+  userId: string,
+  asOf: string,
+  amountVnd: number,
+) {
+  const { error } = await supabase.from('balance_marks').upsert(
+    { user_id: userId, as_of: asOf, amount_vnd: amountVnd },
+    { onConflict: 'user_id,as_of' },
+  )
+  if (error) throw error
+}
+
+export async function deleteBalanceMark(supabase: SupabaseClient, asOf: string) {
+  const { error } = await supabase.from('balance_marks').delete().eq('as_of', asOf)
   if (error) throw error
 }
