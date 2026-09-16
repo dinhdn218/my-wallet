@@ -1,5 +1,6 @@
 import { MobileHeader } from '@/components/layout/mobile-header'
 import { MobileTabbar } from '@/components/layout/mobile-tabbar'
+import { SyncBanner } from '@/components/layout/sync-banner'
 import { StoreBootstrap } from '@/components/store-bootstrap'
 
 /**
@@ -16,6 +17,8 @@ export default function AppLayout({ children }: LayoutProps<'/'>) {
       <StoreBootstrap />
       <div className="flex h-dvh flex-col">
         <MobileHeader className="md:hidden" />
+        {/* Không phải md:hidden: mất mạng thì desktop cũng phải biết. */}
+        <SyncBanner />
         {children}
         <MobileTabbar className="md:hidden" />
       </div>

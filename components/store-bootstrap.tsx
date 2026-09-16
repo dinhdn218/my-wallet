@@ -14,6 +14,10 @@ import { useExpenseStore } from '@/store/useExpenseStore'
  *
  * Đi kèm `skipHydration` trong persist: nếu để persist tự đọc localStorage lúc
  * nạp module thì server render sẽ khác client render và React báo lệch.
+ *
+ * ⚠️ MỌI đường thoát khỏi hàm bootstrap đều phải bật `hasHydrated`. Đó là cờ
+ * duy nhất 10 component dùng để bỏ skeleton; thoát mà không bật thì cả 5 màn
+ * treo skeleton vĩnh viễn, không lời giải thích nào.
  */
 export function StoreBootstrap() {
   const [pending, setPending] = useState<LocalSnapshot | null>(null)
@@ -35,12 +39,31 @@ export function StoreBootstrap() {
       await useExpenseStore.persist.rehydrate()
 
       const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user || cancelled) return
 
-      await useExpenseStore.getState().loadFromServer(user.id)
+      // getUser() gọi mạng chứ không đọc cookie suông, nên mất sóng là nó NÉM
+      // LỖI, không phải trả user null. Bản cũ để lỗi lọt ra ngoài: effect chết
+      // tại đây, loadFromServer không bao giờ chạy, và vì hasHydrated chỉ được
+      // bật bên trong loadFromServer nên màn treo skeleton mãi mãi.
+      let userId: string | null = null
+      try {
+        userId = (await supabase.auth.getUser()).data.user?.id ?? null
+      } catch {
+        if (!cancelled) {
+          useExpenseStore.setState({ hasHydrated: true, syncStatus: 'error' })
+        }
+        return
+      }
+
+      if (cancelled) return
+
+      if (!userId) {
+        // Chưa đăng nhập: proxy.ts đang đá về /dang-nhap. Vẫn nhả cờ để trong
+        // lúc chuyển trang không nhìn thấy một màn skeleton đứng im.
+        useExpenseStore.setState({ hasHydrated: true })
+        return
+      }
+
+      await useExpenseStore.getState().loadFromServer(userId)
       if (cancelled || !local) return
 
       // Chỉ mời di trú khi server CHƯA có giao dịch nào. Thiếu điều kiện này,

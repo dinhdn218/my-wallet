@@ -17,6 +17,7 @@ import {
   useExpenseStore,
 } from '@/store/useExpenseStore'
 import type { Transaction } from '@/types/transaction'
+import { queryMocks } from './test-supabase'
 
 const base: Omit<Transaction, 'id'> = {
   type: 'expense',
@@ -267,5 +268,57 @@ describe('computeAvailableMonths', () => {
     const rows = [tx({ id: 'a', occurredAt: '2026-09-01T09:00:00.000Z' })]
     const budgets = { '2026-09': { 'an-uong': 1_000_000 } }
     expect(computeAvailableMonths(rows, budgets, '2026-09', now)).toEqual(['2026-09'])
+  })
+})
+
+describe('loadFromServer', () => {
+  beforeEach(() => {
+    queryMocks.fetchSnapshot.mockClear()
+    useExpenseStore.setState({
+      transactions: [],
+      categories: [],
+      budgets: {},
+      hasHydrated: false,
+      syncStatus: 'idle',
+      userId: null,
+    })
+  })
+
+  it('nạp xong thì bật hasHydrated và syncStatus ready', async () => {
+    queryMocks.fetchSnapshot.mockResolvedValueOnce({
+      transactions: [tx({ id: 'srv_a' })],
+      categories: [],
+      budgets: {},
+    })
+
+    await useExpenseStore.getState().loadFromServer('u1')
+
+    const s = useExpenseStore.getState()
+    expect(s.hasHydrated).toBe(true)
+    expect(s.syncStatus).toBe('ready')
+    expect(s.transactions).toHaveLength(1)
+    expect(s.userId).toBe('u1')
+  })
+
+  // Đây là lý do tồn tại của bản vá: hasHydrated trước đây chỉ bật ở nhánh
+  // thành công, nên mất mạng là 10 component kẹt skeleton vĩnh viễn — kể cả
+  // khi cache localStorage đã có số để vẽ.
+  it('nạp hỏng vẫn bật hasHydrated và giữ nguyên cache đã đọc', async () => {
+    const cached = [tx({ id: 'cache_1', amountVnd: 250_000 })]
+    useExpenseStore.setState({ transactions: cached })
+    queryMocks.fetchSnapshot.mockRejectedValueOnce(new Error('mất mạng'))
+
+    await useExpenseStore.getState().loadFromServer('u1')
+
+    const s = useExpenseStore.getState()
+    expect(s.hasHydrated).toBe(true)
+    expect(s.syncStatus).toBe('error')
+    expect(s.transactions).toEqual(cached)
+  })
+
+  it('không nuốt lỗi thành trạng thái ready', async () => {
+    queryMocks.fetchSnapshot.mockRejectedValueOnce(new Error('mất mạng'))
+    await useExpenseStore.getState().loadFromServer('u1')
+    expect(useExpenseStore.getState().syncStatus).not.toBe('ready')
   })
 })

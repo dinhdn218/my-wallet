@@ -46,7 +46,9 @@ interface ExpenseState {
   /** Tháng đang xem, dạng "2026-09". Chỉ là view state, không lưu lên server. */
   activeMonth: string
   /**
-   * Đã có dữ liệu để vẽ chưa. Là LATCH MỘT CHIỀU: false -> true, không bao giờ
+   * Đã THỬ nạp xong một lượt chưa — KHÔNG phải "nạp thành công chưa". Bật cả
+   * khi nạp hỏng, để có gì vẽ nấy thay vì kẹt skeleton; việc báo số đang xem là
+   * số cũ thuộc về SyncBanner. LATCH MỘT CHIỀU: false -> true, không bao giờ
    * quay lại. 10 component dùng nó để quyết định hiện skeleton hay số thật; cho
    * nó lật lại khi refetch thì mỗi lần đồng bộ nền cả dashboard sẽ nháy về
    * skeleton. Trạng thái đồng bộ chi tiết nằm ở `syncStatus`.
@@ -124,7 +126,13 @@ export const useExpenseStore = create<ExpenseState>()(
         } catch {
           // Mất mạng: giữ nguyên cache đã đọc từ localStorage để vẫn xem được
           // số cũ, chỉ báo trạng thái lỗi.
-          set({ syncStatus: 'error' })
+          //
+          // hasHydrated PHẢI bật cả ở đây chứ không riêng nhánh thành công: nó là
+          // cờ "đã thử nạp xong một lượt, có gì vẽ nấy". Để nguyên false thì 10
+          // component kẹt skeleton VĨNH VIỄN và lời hứa "vẫn xem được số cũ" ở
+          // ngay trên không bao giờ thành sự thật. Việc nói cho người dùng biết
+          // số đang xem là số cũ thuộc về SyncBanner, không phải cờ này.
+          set({ syncStatus: 'error', hasHydrated: true })
         }
       },
 
