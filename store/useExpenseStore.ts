@@ -893,21 +893,6 @@ export function useMonthComparison(month?: string): MonthComparison {
   return useMemo(() => computeMonthComparison(transactions, key), [transactions, key])
 }
 
-/** Chi lớn nhất trong tháng — thẻ phải dưới của màn Báo cáo. */
-export function useBiggestExpenses(limit = 4, month?: string): Transaction[] {
-  const transactions = useExpenseStore((s) => s.transactions)
-  const activeMonth = useExpenseStore((s) => s.activeMonth)
-  const key = month ?? activeMonth
-  return useMemo(
-    () =>
-      transactions
-        .filter((t) => t.type === 'expense' && monthKey(t.occurredAt) === key)
-        .sort((a, b) => b.amountVnd - a.amountVnd)
-        .slice(0, limit),
-    [transactions, key, limit],
-  )
-}
-
 /** Thu/chi 6 tháng gần nhất — cho mini bar ở Card 2. */
 export function useCashflowSeries(months = 6, from?: string): CashflowPoint[] {
   const transactions = useExpenseStore((s) => s.transactions)

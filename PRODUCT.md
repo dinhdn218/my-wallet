@@ -51,7 +51,8 @@ lại là không quảng cáo, không gói trả phí, không tính năng thừa
 - Danh mục sửa được lúc chạy: đổi tên, đổi màu (trong 6 màu biểu đồ), xoá khi
   chưa có giao dịch nào dùng.
 - Hạn mức chi theo danh mục, theo tháng.
-- Báo cáo: so sánh tháng này với tháng trước, xu hướng nhiều tháng, chi lớn nhất.
+- Báo cáo: **chi tiêu chia theo danh mục** (kèm tỉ trọng), so sánh tháng này
+  với tháng trước, xu hướng nhiều tháng.
 - **Số dư thật**, suy ra từ "mốc số dư" người dùng tự đặt (một con số gộp mọi
   ví/ngân hàng/tiền mặt). Đặt mốc mới = đối soát, và app chỉ ra phần lệch giữa
   sổ và đời thực để người dùng biết mình đã quên ghi khoảng bao nhiêu.

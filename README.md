@@ -41,7 +41,7 @@ Next 16 chỉ cho một `next dev` mỗi thư mục.
 | `/giao-dich` | Danh sách + lọc theo loại/danh mục, sắp xếp, sửa & xoá |
 | `/ngan-sach` | Hạn mức chi theo danh mục, đặt/sửa/gỡ |
 | `/danh-muc` | Đổi tên và màu danh mục, xoá danh mục chưa dùng |
-| `/bao-cao` | Số dư thật, so sánh tháng này với tháng trước |
+| `/bao-cao` | Số dư thật, tiêu vào đâu, so sánh tháng này với tháng trước |
 
 ## Cấu trúc
 

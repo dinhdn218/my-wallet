@@ -9,9 +9,9 @@ import { AmountSkeleton, CardLabel } from '@/components/ui/glass-card'
 import { formatVnd, formatVndShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import {
-  useBiggestExpenses,
   useCashflowSeries,
   useCategoryLookup,
+  useExpenseByCategory,
   useExpenseStore,
   useMonthComparison,
 } from '@/store/useExpenseStore'
@@ -35,7 +35,7 @@ export default function ReportPage() {
 
   const series = useCashflowSeries(months)
   const comparison = useMonthComparison()
-  const biggest = useBiggestExpenses(4)
+  const slices = useExpenseByCategory()
 
   const averages = useMemo(() => {
     if (series.length === 0) return { income: 0, expense: 0, savingRate: 0 }
@@ -227,32 +227,59 @@ export default function ReportPage() {
           )}
         </section>
 
+        {/*
+          Thay cho khối "Chi lớn nhất" cũ, vốn chỉ liệt kê 4 GIAO DỊCH đắt nhất
+          — một giai thoại, không phải câu trả lời. Sáu mươi ly cà phê 40k là
+          2,4 triệu mà không khoản nào lọt top 4, nên tiền đi đâu vẫn không ai
+          thấy. Bản thân danh sách khoản đắt nhất không mất: /giao-dich lọc
+          loại = Chi rồi sắp theo Số tiền là ra đúng thứ đó.
+        */}
         <section className="flex flex-col">
-          <CardLabel>Chi lớn nhất tháng {monthNo}</CardLabel>
+          <CardLabel>Tiêu vào đâu tháng {monthNo}</CardLabel>
 
           {!hasHydrated ? (
             <AmountSkeleton className="mt-4 h-24 w-full" />
-          ) : biggest.length === 0 ? (
+          ) : slices.length === 0 ? (
             <p className="mt-4 text-[15px] text-muted">
               Tháng này chưa có khoản chi nào.
             </p>
           ) : (
-            <ul className="mt-3.5 flex flex-col gap-2.5">
-              {biggest.map((row) => {
-                const category = lookup(row.categoryId)
+            <ul className="mt-3.5 flex flex-col gap-3">
+              {slices.map((slice) => {
+                const category = lookup(slice.categoryId)
+                const percent = Math.round(slice.share * 100)
                 return (
-                  <li key={row.id} className="flex items-center gap-2.5">
-                    <span
-                      className="size-2 shrink-0"
-                      style={{ background: category.color }}
-                      aria-hidden
-                    />
-                    <span className="min-w-0 flex-1 text-[15px] text-pretty">
-                      {row.note ?? category.label}
-                    </span>
-                    <span className="shrink-0 text-[16px] font-semibold tabular-nums">
-                      {formatVnd(row.amountVnd)}
-                    </span>
+                  <li key={slice.categoryId} className="flex flex-col gap-1.5">
+                    <div className="flex items-baseline gap-2.5">
+                      <span
+                        className="size-2 shrink-0 self-center"
+                        style={{ background: category.color }}
+                        aria-hidden
+                      />
+                      <span className="min-w-0 flex-1 text-[15px] text-pretty">
+                        {category.label}
+                      </span>
+                      {/* Tỉ trọng đi kèm số tiền: 4,2tr là nhiều hay ít chỉ có
+                          nghĩa khi biết nó chiếm bao nhiêu phần tổng chi. */}
+                      <span className="shrink-0 font-mono text-[11px] text-muted tabular-nums">
+                        {percent}%
+                      </span>
+                      <span className="shrink-0 text-[16px] font-semibold tabular-nums">
+                        {formatVnd(slice.amount)}
+                      </span>
+                    </div>
+                    {/* Thanh tỉ trọng: đọc được thứ hạng bằng MẮT mà không phải
+                        so từng con số — và không chỉ dựa vào màu danh mục, vì
+                        chiều dài tự nó đã mang thông tin. */}
+                    <div className="ml-[18px] h-[6px] bg-men-sau" aria-hidden>
+                      <div
+                        className="h-full transition-[width] duration-500"
+                        style={{
+                          width: `${Math.max(percent, 1)}%`,
+                          background: category.color,
+                        }}
+                      />
+                    </div>
                   </li>
                 )
               })}
