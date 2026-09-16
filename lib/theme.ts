@@ -1,5 +1,6 @@
 export type Theme = 'dark' | 'light'
 
+/** ⚠️ Giữ tiền tố 'vi-rieng/' (tên cũ) — xem lib/migrate-local.ts. */
 export const THEME_STORAGE_KEY = 'vi-rieng/theme'
 
 /**

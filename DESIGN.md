@@ -1,5 +1,5 @@
 ---
-name: Ví Riêng
+name: Bảng Chi
 description: A hand-painted Vietnamese eatery price board for tracking personal spending.
 colors:
   men: "#0f4c3a"
@@ -139,7 +139,7 @@ components:
     height: "44px"
 ---
 
-# Design System: Ví Riêng
+# Design System: Bảng Chi
 
 ## Overview
 

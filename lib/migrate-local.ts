@@ -10,6 +10,12 @@ import type { Transaction } from '@/types/transaction'
  * { state: {...}, version: n }.
  */
 
+/**
+ * ⚠️ Tiền tố 'vi-rieng/' là tên CŨ của app (nay là "Bảng Chi") và phải GIỮ
+ * NGUYÊN. Khoá lưu trữ là định danh dữ liệu, không phải thương hiệu: đổi nó
+ * làm cache và BẢN SAO LƯU trước-Supabase của người dùng thành mồ côi, luồng
+ * di trú sẽ không tìm thấy chúng nữa. Đổi tên app không phải lý do để mất dữ liệu.
+ */
 export const STORAGE_KEY = 'vi-rieng/expenses'
 export const DECLINED_KEY = 'vi-rieng/migration-declined'
 /**

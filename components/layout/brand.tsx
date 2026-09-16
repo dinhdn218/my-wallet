@@ -23,7 +23,7 @@ export function Brand({
     <div className={cn('flex items-center gap-2.5', className)}>
       <span className={cn('shrink-0 bg-accent', s.mark)} aria-hidden />
       <span className={cn('font-semibold tracking-[.01em]', s.text)}>
-        Ví Riêng
+        Bảng Chi
       </span>
     </div>
   )

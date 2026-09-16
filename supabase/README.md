@@ -1,4 +1,4 @@
-# Dựng Supabase cho Ví Riêng
+# Dựng Supabase cho Bảng Chi
 
 Làm một lần, mất khoảng 10 phút. Sau bước này dữ liệu nằm trên server, đổi máy
 chỉ cần đăng nhập lại.
@@ -6,7 +6,7 @@ chỉ cần đăng nhập lại.
 ## 1. Tạo project
 
 1. Vào [supabase.com](https://supabase.com) → **New project**.
-2. Đặt tên tuỳ ý (ví dụ `vi-rieng`), chọn region **Southeast Asia (Singapore)** —
+2. Đặt tên tuỳ ý (ví dụ `bang-chi`), chọn region **Southeast Asia (Singapore)** —
    gần Việt Nam nhất.
 3. Đặt **Database Password** và lưu lại vào trình quản lý mật khẩu. Mật khẩu này
    không dùng để đăng nhập app, nhưng cần khi thao tác trực tiếp với DB.

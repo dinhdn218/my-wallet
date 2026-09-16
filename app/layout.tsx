@@ -21,7 +21,7 @@ const mono = Roboto_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Ví Riêng — quản lý chi tiêu',
+  title: 'Bảng Chi — quản lý chi tiêu',
   description: 'Thu chi cá nhân, VND.',
 }
 
