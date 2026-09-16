@@ -1,0 +1,44 @@
+-- ===========================================================================
+-- 001 — Gỡ khái niệm "nguồn tiền": xoá cột transactions.account_id
+--
+-- ⚠️⚠️  MIGRATION NÀY XOÁ DỮ LIỆU VĨNH VIỄN  ⚠️⚠️
+--
+-- Sau khi chạy, MỌI giao dịch cũ sẽ KHÔNG CÒN biết đã trả bằng Techcombank,
+-- Tiền mặt hay Ví Momo. Không khôi phục được nếu chưa sao lưu.
+--
+-- Lý do gỡ (xem PRODUCT.md § Capabilities and Constraints): không có số dư đầu
+-- kỳ nên con số theo từng nguồn không bao giờ khớp đời thực; giữ lại chỉ tạo
+-- thêm một ô bắt buộc chọn trong form nhập mà không đổi lại được gì.
+--
+-- ---------------------------------------------------------------------------
+-- BƯỚC 1 — SAO LƯU TRƯỚC (bắt buộc, chạy riêng và tự kiểm tra kết quả)
+-- ---------------------------------------------------------------------------
+-- Chạy riêng câu này TRƯỚC, và chỉ đi tiếp khi đã thấy bảng sao lưu có đủ dòng:
+--
+--     create table public.transactions_account_backup as
+--     select id, user_id, account_id from public.transactions;
+--
+--     select count(*) from public.transactions_account_backup;   -- phải > 0
+--     select count(*) from public.transactions;                  -- phải khớp
+--
+-- Muốn khôi phục về sau (chỉ được nếu bảng sao lưu còn):
+--
+--     alter table public.transactions add column account_id text;
+--     update public.transactions t
+--        set account_id = b.account_id
+--       from public.transactions_account_backup b
+--      where b.id = t.id;
+--
+-- ---------------------------------------------------------------------------
+-- BƯỚC 2 — Gỡ cột (chỉ chạy sau khi BƯỚC 1 đã xong và đã kiểm tra)
+-- ---------------------------------------------------------------------------
+-- Ứng dụng phải được deploy TRƯỚC hoặc CÙNG LÚC: cột đang `not null` nên bản
+-- app cũ (còn gửi account_id) vẫn chạy được sau khi xoá cột, nhưng bản app mới
+-- (không gửi account_id) sẽ LỖI nếu cột vẫn còn `not null`. Thứ tự an toàn:
+-- chạy migration này rồi deploy app mới ngay.
+
+alter table public.transactions
+  drop column if exists account_id;
+
+-- Ghi chú: CHECK constraint account_id in ('techcombank','cash','momo') tự biến
+-- mất theo cột, không cần drop riêng.

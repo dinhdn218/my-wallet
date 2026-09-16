@@ -31,7 +31,6 @@ export const queryMocks = {
     type: 'expense',
     amountVnd: 100_000,
     categoryId: 'an-uong',
-    accountId: 'cash',
     occurredAt: '2026-09-01T09:00:00.000Z',
     createdAt: '2026-09-01T09:00:00.000Z',
     ...patch,

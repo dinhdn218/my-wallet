@@ -5,6 +5,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { categoryOf } from '@/lib/categories'
 import type { Category, CategoryId } from '@/lib/categories'
+import { daysLeftInMonth } from '@/lib/format'
 import { SEED_ACTIVE_MONTH } from '@/lib/seed-data'
 import type { Budgets } from '@/lib/seed-data'
 import { createClient } from '@/lib/supabase/client'
@@ -19,14 +20,9 @@ import {
   updateTransactionRow,
   upsertBudget,
 } from '@/lib/supabase/queries'
-import type {
-  AccountId,
-  NewTransaction,
-  Transaction,
-  TxType,
-} from '@/types/transaction'
+import type { NewTransaction, Transaction, TxType } from '@/types/transaction'
 
-export type { AccountId, NewTransaction, Transaction, TxType }
+export type { NewTransaction, Transaction, TxType }
 
 /** Hạn mức chi theo tháng: budgets["2026-09"]["an-uong"] = 5_000_000 */
 export type { Budgets }
@@ -320,7 +316,13 @@ export function useMonthlySummary(month?: string): MonthlySummary {
   )
 }
 
-/** Tổng số dư mọi thời điểm (mọi tháng, mọi nguồn tiền). */
+/**
+ * Tổng chênh lệch thu-chi mọi thời điểm.
+ *
+ * ⚠️ KHÔNG phải "tiền đang có": không có số dư đầu kỳ nên đây chỉ là tổng dẫn
+ * xuất từ các khoản đã ghi. Vì vậy màn chính KHÔNG hiện con số này như một
+ * "số dư" — nó chỉ dùng ở màn Báo cáo, có nhãn nói rõ.
+ */
 export const useTotalBalance = () =>
   useExpenseStore((s) =>
     s.transactions.reduce(
@@ -328,21 +330,6 @@ export const useTotalBalance = () =>
       0,
     ),
   )
-
-export function computeBalanceByAccount(
-  transactions: Transaction[],
-): Record<AccountId, number> {
-  const acc: Record<AccountId, number> = { techcombank: 0, cash: 0, momo: 0 }
-  for (const t of transactions) {
-    acc[t.accountId] += t.type === 'income' ? t.amountVnd : -t.amountVnd
-  }
-  return acc
-}
-
-export function useBalanceByAccount(): Record<AccountId, number> {
-  const transactions = useExpenseStore((s) => s.transactions)
-  return useMemo(() => computeBalanceByAccount(transactions), [transactions])
-}
 
 export interface CategorySlice {
   categoryId: CategoryId
@@ -482,6 +469,57 @@ export function computeBudgetStatus(used: number, limit: number): BudgetStatus {
     over,
     overBy: over ? used - limit : 0,
   }
+}
+
+/**
+ * Con số dẫn đầu của cả ứng dụng: "còn tiêu được tháng này".
+ *
+ * Đây là câu hỏi người dùng muốn trả lời trong 2 giây đầu, và nó thay thế
+ * "Tổng số dư" của bản cũ — vốn là một con số gây hiểu lầm vì không có số dư
+ * đầu kỳ (xem useTotalBalance).
+ *
+ * ⚠️ Khi CHƯA đặt hạn mức nào, `coHanMuc` = false và `conLai` vô nghĩa: màn
+ * chính phải hiện "đã tiêu tháng này" thay vì một con số còn lại bịa ra.
+ * Đây là lý do hook trả về cờ chứ không trả về 0 — 0 sẽ hiện thành "còn 0đ",
+ * đúng kiểu con số sai mà PRODUCT.md § Product Principles cấm.
+ */
+export interface ConTieuDuoc {
+  coHanMuc: boolean
+  daTieu: number
+  hanMuc: number
+  conLai: number
+  /** 0..1, đã kẹp — cho thanh tiến độ. */
+  share: number
+  over: boolean
+  soNgayConLai: number
+  /** Chia đều phần còn lại cho số ngày còn lại; 0 khi đã vượt. */
+  moiNgay: number
+}
+
+export function useConTieuDuoc(month?: string): ConTieuDuoc {
+  const transactions = useExpenseStore((s) => s.transactions)
+  const budgets = useExpenseStore((s) => s.budgets)
+  const activeMonth = useExpenseStore((s) => s.activeMonth)
+  const key = month ?? activeMonth
+
+  return useMemo(() => {
+    const daTieu = computeMonthlySummary(transactions, key).expense
+    const hanMuc = Object.values(budgets[key] ?? {}).reduce((a, n) => a + n, 0)
+    const status = computeBudgetStatus(daTieu, hanMuc)
+    const conLai = Math.max(0, hanMuc - daTieu)
+    const soNgayConLai = daysLeftInMonth(key)
+
+    return {
+      coHanMuc: hanMuc > 0,
+      daTieu,
+      hanMuc,
+      conLai,
+      share: status.share,
+      over: status.over,
+      soNgayConLai,
+      moiNgay: conLai > 0 ? Math.round(conLai / soNgayConLai) : 0,
+    }
+  }, [transactions, budgets, key])
 }
 
 /** Tình trạng ngân sách cả tháng — thẻ "Cả tháng" ở cột phải màn 2b. */

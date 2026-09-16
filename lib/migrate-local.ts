@@ -129,7 +129,6 @@ export async function uploadLocalSnapshot(
         type: t.type,
         amountVnd: t.amountVnd,
         categoryId: t.categoryId,
-        accountId: t.accountId,
         note: t.note ?? null,
         occurredAt: t.occurredAt,
         createdAt: t.createdAt,

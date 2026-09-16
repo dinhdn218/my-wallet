@@ -29,17 +29,19 @@ export function AmountInput({
 }: AmountInputProps) {
   const parsed = parseAmountVnd(value)
   const [digits, suffix] = splitSuffix(value)
-  const big = mode === 'display' ? 'text-[52px]' : 'text-[40px]'
+  // Cùng một vai với ô nhập ở màn chính (38px) — giữ một cỡ duy nhất cho
+  // "số tiền đang gõ" ở mọi chỗ.
+  const big = mode === 'display' ? 'text-[52px]' : 'text-[38px]'
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      <h3 className="font-mono text-[10.5px] font-bold tracking-[.16em] text-muted uppercase">
+      <h3 className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
         Số tiền
       </h3>
 
       <div
         className={cn(
-          'rounded-[18px] border border-glass-border bg-well px-4 py-3.5',
+          'bg-men-sau px-4 py-3.5',
           mode === 'input' ? 'flex items-center gap-3' : 'flex flex-col gap-2',
         )}
       >
@@ -53,7 +55,7 @@ export function AmountInput({
               placeholder="0"
               aria-label="Số tiền"
               className={cn(
-                'w-full min-w-0 bg-transparent font-extrabold tabular-nums outline-none',
+                'w-full min-w-0 bg-transparent font-semibold tabular-nums outline-none',
                 'placeholder:text-foreground/25',
                 big,
               )}
@@ -61,7 +63,7 @@ export function AmountInput({
           ) : (
             <p
               className={cn(
-                'flex min-h-[58px] items-center font-extrabold tabular-nums',
+                'flex min-h-[58px] items-center font-semibold tabular-nums',
                 big,
               )}
               aria-live="polite"
@@ -86,8 +88,8 @@ export function AmountInput({
         {parsed !== null && (
           <span
             className={cn(
-              'shrink-0 rounded-xl border border-accent/45 bg-accent/16 px-2.5 py-1.5',
-              'font-extrabold tabular-nums text-accent',
+              'shrink-0 bg-accent px-2.5 py-1.5',
+              'font-semibold tabular-nums text-accent-foreground',
               mode === 'display' ? 'self-start text-[19px]' : 'text-[19px]',
             )}
           >

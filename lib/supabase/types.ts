@@ -10,7 +10,6 @@ export interface TransactionRow {
   type: string
   amount_vnd: number
   category_id: string
-  account_id: string
   note: string | null
   occurred_at: string
   created_at: string

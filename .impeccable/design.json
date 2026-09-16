@@ -1,0 +1,474 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-16T00:00:00.000Z",
+  "title": "Design System: Ví Riêng",
+  "extensions": {
+    "colorMeta": {
+      "men": {
+        "role": "primary",
+        "displayName": "Enamel Green",
+        "canonical": "#0f4c3a",
+        "note": "The board itself. A field occupying 40%+ of every screen, never an accent. Contrast is measured against the gradient peak #14604A, not this flat value.",
+        "tonalRamp": [
+          "#04150f",
+          "#082e23",
+          "#0a382b",
+          "#0f4c3a",
+          "#1b6b52",
+          "#cfe0d2",
+          "#5b9a7c",
+          "#a8ccb8"
+        ]
+      },
+      "men-sun": {
+        "role": "primary",
+        "displayName": "Sunlit Enamel",
+        "canonical": "#cfe0d2",
+        "note": "MEASURED CEILING, not a taste choice. 2.54x the luminance of the dark board (L .141 vs .056). Any brighter and ivory foreground drops below 4.5:1, forcing a flip to dark ink that destroys figure/ground polarity.",
+        "tonalRamp": [
+          "#0c2a1e",
+          "#14402f",
+          "#1d5440",
+          "#a2bdaa",
+          "#b2c9b8",
+          "#cfe0d2",
+          "#5f8269",
+          "#c6e0d2"
+        ]
+      },
+      "men-dam": {
+        "role": "neutral",
+        "displayName": "Recessed Enamel",
+        "canonical": "#0a382b",
+        "note": "Wells pressed into the board: capture column, keypad zone, left nav column.",
+        "tonalRamp": [
+          "#03110c",
+          "#061f18",
+          "#0a382b",
+          "#0f4c3a",
+          "#166046",
+          "#b2c9b8",
+          "#4d8a6d",
+          "#9cc4ae"
+        ]
+      },
+      "men-sau": {
+        "role": "neutral",
+        "displayName": "Deepest Well",
+        "canonical": "#082e23",
+        "note": "The deepest recess: live amount display and every text input.",
+        "tonalRamp": [
+          "#020c08",
+          "#051a14",
+          "#082e23",
+          "#0d4132",
+          "#135442",
+          "#a2bdaa",
+          "#43806a",
+          "#93bfab"
+        ]
+      },
+      "men-phim": {
+        "role": "neutral",
+        "displayName": "Key Face",
+        "canonical": "#11553f",
+        "note": "Raised paint of a keypad key. Sits proud of the ground, not recessed into it.",
+        "tonalRamp": [
+          "#041610",
+          "#092f23",
+          "#11553f",
+          "#176b4f",
+          "#1f8160",
+          "#dceade",
+          "#69a98c",
+          "#b2d6c3"
+        ]
+      },
+      "men-vien": {
+        "role": "neutral",
+        "displayName": "Wire",
+        "canonical": "#2e6b55",
+        "note": "Hairlines, the hanging wire for price tags, the dotted leader, scrollbar thumb. Never a container outline.",
+        "tonalRamp": [
+          "#0a1f18",
+          "#14382b",
+          "#1f523f",
+          "#2e6b55",
+          "#3f8469",
+          "#5f8269",
+          "#a2c8b4",
+          "#d3e7dc"
+        ]
+      },
+      "son-nga": {
+        "role": "neutral",
+        "displayName": "Ivory Paint",
+        "canonical": "#f2e8d5",
+        "note": "All primary text and the big number. The FIGURE of the composition, and it stays the figure in both themes.",
+        "tonalRamp": [
+          "#403829",
+          "#5f5440",
+          "#807258",
+          "#a39d85",
+          "#c4baa2",
+          "#ded2ba",
+          "#f2e8d5",
+          "#0b3325"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Chalk",
+        "canonical": "#c2dcce",
+        "note": "5.15:1 on the brightest point of the enamel gradient. This is a FLOOR. Do not lower to #A8CBB9 (4.25:1).",
+        "tonalRamp": [
+          "#22392e",
+          "#33523f",
+          "#4a6f58",
+          "#668d74",
+          "#8aae97",
+          "#a8c6b5",
+          "#c2dcce",
+          "#2a5544"
+        ]
+      },
+      "accent": {
+        "role": "secondary",
+        "displayName": "Turmeric Yellow",
+        "canonical": "#edc948",
+        "note": "Income amounts, selected category tag, active nav item, brand mark, caret, text selection. Income and selection are deliberately the same signal.",
+        "tonalRamp": [
+          "#3a2e00",
+          "#5c4a05",
+          "#836a0d",
+          "#ab8d18",
+          "#d0ae2b",
+          "#edc948",
+          "#6e4c00",
+          "#fbeeb4"
+        ]
+      },
+      "negative": {
+        "role": "tertiary",
+        "displayName": "Vermilion",
+        "canonical": "#c9301a",
+        "note": "Record button and over-budget state only. 5.36:1 with white in dark, 5.09:1 in light. NEVER lightened in light mode: a pale CTA reads as disabled.",
+        "tonalRamp": [
+          "#340c05",
+          "#54140a",
+          "#7a1e0e",
+          "#a02714",
+          "#c9301a",
+          "#b32d12",
+          "#e4664f",
+          "#f3ab9b"
+        ]
+      },
+      "the": {
+        "role": "neutral",
+        "displayName": "Tag Paper",
+        "canonical": "#e8dcc4",
+        "note": "The hanging paper price tags: the only non-enamel surface in the world, which is why categories read as physical objects clipped to the board.",
+        "tonalRamp": [
+          "#3b3323",
+          "#5a4f38",
+          "#7d6f52",
+          "#a2926f",
+          "#c4b694",
+          "#dbcfb4",
+          "#e8dcc4",
+          "#0b3325"
+        ]
+      },
+      "the-muc": {
+        "role": "neutral",
+        "displayName": "Tag Ink",
+        "canonical": "#1a1714",
+        "tonalRamp": [
+          "#0c0a09",
+          "#1a1714",
+          "#17332a",
+          "#3a332c",
+          "#5c5348",
+          "#847a6c",
+          "#b3aaa0",
+          "#ddd8d2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The leading 'còn tiêu được' number. Exactly one per screen. Tabular figures, and it falls live as an amount is typed."
+      },
+      "display-compact": {
+        "displayName": "Display Compact",
+        "purpose": "The same number on mobile, stepped down one notch specifically to buy vertical room for the keypad."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Month title on the board column."
+      },
+      "keypad": {
+        "displayName": "Keypad",
+        "purpose": "Numeric key faces. Unit keys (k, tr) drop to 19px/600 in turmeric to separate them from digits."
+      },
+      "amount": {
+        "displayName": "Amount",
+        "purpose": "The price at the end of every board row. Tabular figures."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Transaction names and item text. Oswald sets everything that is not a label; there is no separate body face."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Every measurement label, day heading, section heading, metadata line. 11px is a floor and .2em is the single canonical tracking across the whole app (the .nhan-do role)."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "120ms linear",
+        "purpose": "Hover and active brightness shifts on keys, tags, buttons, nav rows."
+      },
+      {
+        "name": "flood",
+        "value": "200ms ease",
+        "purpose": "Category color flooding the amount well, numeral, caret, and edge block."
+      },
+      {
+        "name": "number-fall",
+        "value": "300ms ease-out",
+        "purpose": "The leading number falling as an amount is typed. Exponential ease-out from the already-visible value, never a fade-in from empty. Suppressed under prefers-reduced-motion."
+      },
+      {
+        "name": "bar-fill",
+        "value": "500ms",
+        "purpose": "Budget progress bar width change."
+      },
+      {
+        "name": "theme-swap",
+        "value": "180ms ease",
+        "purpose": "Background and color transition when switching between the indoor and sunlit board."
+      },
+      {
+        "name": "tap-key",
+        "value": "scale(0.97)",
+        "purpose": "Keypad key press. Suppressed under prefers-reduced-motion."
+      },
+      {
+        "name": "tap-record",
+        "value": "scale(0.99)",
+        "purpose": "Record button press. Suppressed under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "md",
+        "value": "768px",
+        "purpose": "Stacked mobile board becomes the two-column desktop board."
+      },
+      {
+        "name": "xl",
+        "value": "1280px",
+        "purpose": "Capture column widens from 360px to 400px."
+      }
+    ],
+    "materials": [
+      {
+        "name": "men-mat",
+        "purpose": "The enamel surface. Light pools at top-left, shadow gathers at bottom-right, plus two procedural texture layers.",
+        "css": ".men-mat { background: radial-gradient(120% 90% at 18% 4%, color-mix(in oklab, var(--men) 84%, white) 0%, transparent 58%), radial-gradient(90% 70% at 86% 92%, color-mix(in oklab, var(--men) 88%, black) 0%, transparent 60%), var(--men); position: relative; }",
+        "knownSubstitution": "The grain and brush-drag layers are PROCEDURAL inline SVG feTurbulence, not a produced raster. The finish review scored this a partial material solution and explicitly recommended recording it as a known substitution rather than continuing to tune noise parameters. An agent with image generation should replace it with a real painted-enamel raster."
+      },
+      {
+        "name": "mep-men",
+        "purpose": "Chipped enamel seam where two enamel areas meet. Deliberately not a border: real enamel has thick and thin spots, not a ruled line.",
+        "css": ".mep-men::after { content: ''; position: absolute; inset-block: 0; right: 0; width: 2px; background: linear-gradient(to bottom, transparent 0%, color-mix(in oklab, var(--foreground) 14%, transparent) 8%, transparent 22%, color-mix(in oklab, var(--foreground) 9%, transparent) 46%, transparent 61%, color-mix(in oklab, var(--foreground) 16%, transparent) 78%, transparent 95%); }"
+      },
+      {
+        "name": "duong-cham",
+        "purpose": "The dotted leader connecting item name to price. Drawn as a background rather than border-bottom so dots stay round and clear of the text baseline.",
+        "css": ".duong-cham { background-image: radial-gradient(circle, var(--men-vien) 1px, transparent 1px); background-size: 6px 1px; background-repeat: repeat-x; }"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Record Button",
+      "kind": "button",
+      "refersTo": "button-record",
+      "description": "The primary action. Vermilion, hard rectangle, labelled with the actual amount and category rather than a generic verb.",
+      "html": "<button class=\"ds-btn-record\">GHI 45.000Đ · ĂN UỐNG</button>",
+      "css": ".ds-btn-record { display: flex; align-items: center; justify-content: center; gap: 8px; height: 58px; padding: 0 16px; background: var(--negative, #c9301a); color: var(--negative-foreground, #fff); font-family: var(--font-oswald), sans-serif; font-size: 17px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border: none; border-radius: 0; cursor: pointer; transition: filter 120ms, background-color 120ms; } .ds-btn-record:hover { filter: brightness(1.1); } .ds-btn-record:active { filter: brightness(.95); transform: scale(.99); } .ds-btn-record:focus-visible { outline: 2px solid var(--accent, #edc948); outline-offset: -2px; }"
+    },
+    {
+      "name": "Record Button (disabled)",
+      "kind": "button",
+      "refersTo": "button-record-disabled",
+      "description": "Not-ready state. Falls back to key-face green and states what is missing instead of greying out silently.",
+      "html": "<button class=\"ds-btn-record-off\" disabled>Chọn danh mục</button>",
+      "css": ".ds-btn-record-off { display: flex; align-items: center; justify-content: center; height: 58px; padding: 0 16px; background: var(--men-phim, #11553f); color: var(--muted, #c2dcce); font-family: var(--font-oswald), sans-serif; font-size: 17px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border: none; border-radius: 0; }"
+    },
+    {
+      "name": "Numeric Keypad",
+      "kind": "custom",
+      "refersTo": "keypad-key",
+      "description": "Always on screen, never behind a sheet. The k and tr unit keys are why this exists instead of the system keyboard: '300k' is 4 taps.",
+      "html": "<div class=\"ds-keypad\"><button class=\"ds-key\">1</button><button class=\"ds-key\">2</button><button class=\"ds-key\">3</button><button class=\"ds-key ds-key-unit\">k</button><button class=\"ds-key\">4</button><button class=\"ds-key\">5</button><button class=\"ds-key\">6</button><button class=\"ds-key ds-key-unit\">tr</button><button class=\"ds-key\">7</button><button class=\"ds-key\">8</button><button class=\"ds-key\">9</button><button class=\"ds-key\">⌫</button><button class=\"ds-key\">,</button><button class=\"ds-key\">0</button><button class=\"ds-key\">000</button><button class=\"ds-key ds-key-thu\">THU</button></div>",
+      "css": ".ds-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; } .ds-key { display: flex; align-items: center; justify-content: center; height: 58px; background: var(--men-phim, #11553f); color: var(--foreground, #f2e8d5); font-family: var(--font-oswald), sans-serif; font-size: 26px; font-weight: 500; border: none; border-radius: 0; cursor: pointer; transition: filter 120ms; } .ds-key:hover { filter: brightness(1.1); } .ds-key:active { filter: brightness(.95); transform: scale(.97); } .ds-key-unit { font-size: 19px; font-weight: 600; color: var(--accent, #edc948); } .ds-key-thu { font-size: 15px; font-weight: 600; color: var(--accent, #edc948); }"
+    },
+    {
+      "name": "Amount Well",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "The signature input: a well rather than a field. The selected category color floods the ground, the numeral, the caret, and an 8px leading edge block.",
+      "html": "<div class=\"ds-well\"><span class=\"ds-well-edge\"></span><span class=\"ds-well-label\">CHI</span><div class=\"ds-well-body\"><span class=\"ds-well-num\">45k</span><span class=\"ds-well-caret\"></span></div></div>",
+      "css": ".ds-well { display: flex; align-items: stretch; background: color-mix(in oklab, #3ed6b5 22%, var(--men-sau, #082e23)); border-radius: 0; transition: background-color 200ms; } .ds-well-edge { width: 8px; flex-shrink: 0; background: #3ed6b5; } .ds-well-label { align-self: center; padding-left: 12px; font-family: var(--font-roboto-mono), monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted, #c2dcce); } .ds-well-body { display: flex; flex: 1; align-items: center; justify-content: flex-end; gap: 4px; padding: 10px 16px 10px 0; } .ds-well-num { font-family: var(--font-oswald), sans-serif; font-size: 38px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; color: #3ed6b5; } .ds-well-caret { width: 3px; height: 32px; background: #3ed6b5; animation: ds-pulse 1s ease-in-out infinite; } @keyframes ds-pulse { 50% { opacity: .35; } }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Deepest-well fill, no border, no radius. Focus is a 2px inset turmeric ring and nothing else.",
+      "html": "<input class=\"ds-input\" placeholder=\"Ghi chú — ví dụ: đi chợ cuối tuần\" />",
+      "css": ".ds-input { height: 46px; width: 100%; padding: 0 14px; background: var(--men-sau, #082e23); color: var(--foreground, #f2e8d5); font-family: var(--font-oswald), sans-serif; font-size: 15px; border: none; border-radius: 0; outline: none; } .ds-input::placeholder { color: var(--muted, #c2dcce); } .ds-input:focus-visible { box-shadow: inset 0 0 0 2px var(--accent, #edc948); }"
+    },
+    {
+      "name": "Price Tag",
+      "kind": "chip",
+      "refersTo": "price-tag",
+      "description": "The category unit: a paper tag hanging from a wire rail. Selection floods the whole tag to turmeric, never an outline or a checkmark.",
+      "html": "<div class=\"ds-rail\"></div><div class=\"ds-tags\"><button class=\"ds-tag ds-tag-on\"><span class=\"ds-tag-wire\"></span><span class=\"ds-tag-head\"><span class=\"ds-tag-dot\" style=\"background:#edc948\"></span><span class=\"ds-tag-name\">Ăn uống</span></span><span class=\"ds-tag-sum\">5,2tr</span></button><button class=\"ds-tag\"><span class=\"ds-tag-wire\"></span><span class=\"ds-tag-head\"><span class=\"ds-tag-dot\" style=\"background:#ff7a9c\"></span><span class=\"ds-tag-name\">Đi lại</span></span><span class=\"ds-tag-sum\">1,9tr</span></button></div>",
+      "css": ".ds-rail { height: 1px; background: var(--men-vien, #2e6b55); } .ds-tags { display: flex; gap: 8px; } .ds-tag { position: relative; display: flex; flex-direction: column; flex-shrink: 0; margin-top: 12px; padding: 10px 12px 12px; text-align: left; background: var(--the, #e8dcc4); color: var(--the-muc, #1a1714); font-family: var(--font-oswald), sans-serif; border: none; border-radius: 0; cursor: pointer; transition: filter 120ms; } .ds-tag:hover { filter: brightness(1.04); } .ds-tag-on { background: var(--accent, #edc948); color: var(--accent-foreground, #3a2e00); } .ds-tag-wire { position: absolute; top: -12px; left: 50%; width: 1px; height: 12px; background: var(--men-vien, #2e6b55); } .ds-tag-head { display: flex; align-items: center; gap: 6px; } .ds-tag-dot { width: 8px; height: 8px; flex-shrink: 0; } .ds-tag-name { font-size: 13px; font-weight: 500; line-height: 1.2; } .ds-tag-sum { margin-top: 2px; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Board Row",
+      "kind": "custom",
+      "refersTo": "body",
+      "description": "The single transaction-display unit for the whole app. A price-board line with a dotted leader. Expenses are plain prices; only income carries a + and turmeric.",
+      "html": "<button class=\"ds-row\"><span class=\"ds-row-dot\" style=\"background:#3ed6b5\"></span><span class=\"ds-row-name\">Đi chợ nấu ăn cuối tuần</span><span class=\"ds-row-lead\"></span><span class=\"ds-row-meta\">ĂN UỐNG · 17:05</span><span class=\"ds-row-amt\">412.000đ</span></button>",
+      "css": ".ds-row { display: flex; width: 100%; align-items: baseline; gap: 12px; padding: 10px 0; text-align: left; background: none; border: none; border-radius: 0; font-family: var(--font-oswald), sans-serif; color: var(--foreground, #f2e8d5); cursor: pointer; transition: background-color 120ms; } .ds-row:hover { background: color-mix(in oklab, var(--foreground, #f2e8d5) 5%, transparent); } .ds-row-dot { width: 8px; height: 8px; flex-shrink: 0; align-self: center; } .ds-row-name { flex-shrink: 0; font-size: 16px; font-weight: 400; } .ds-row-lead { flex: 1; align-self: center; height: 1px; margin-bottom: 3px; background-image: radial-gradient(circle, var(--men-vien, #2e6b55) 1px, transparent 1px); background-size: 6px 1px; background-repeat: repeat-x; } .ds-row-meta { flex-shrink: 0; font-family: var(--font-roboto-mono), monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted, #c2dcce); } .ds-row-amt { flex-shrink: 0; font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Leading Number",
+      "kind": "custom",
+      "refersTo": "display",
+      "description": "The 'còn tiêu được' display. Falls live as an amount is typed; over-budget is signalled by color, word, and bar direction together.",
+      "html": "<div class=\"ds-lead\"><p class=\"ds-lead-label\">Còn tiêu được tháng 9</p><p class=\"ds-lead-num\">7.775.000<span class=\"ds-lead-unit\">đ</span></p><p class=\"ds-lead-sub\">Đã tiêu <b>16.180.000đ</b> trên <b>24.000.000đ</b><br/>Còn <b>14 ngày</b> · khoảng <b>558.571đ</b> mỗi ngày</p><div class=\"ds-lead-bar\"><div class=\"ds-lead-fill\" style=\"width:67%\"></div></div></div>",
+      "css": ".ds-lead { display: flex; flex-direction: column; font-family: var(--font-oswald), sans-serif; color: var(--foreground, #f2e8d5); } .ds-lead-label { font-family: var(--font-roboto-mono), monospace; font-size: 11px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--muted, #c2dcce); margin: 0; } .ds-lead-num { display: flex; align-items: baseline; gap: 6px; margin: 8px 0 0; font-size: clamp(52px, 6vw, 88px); font-weight: 600; line-height: .86; letter-spacing: -.035em; font-variant-numeric: tabular-nums; transition: color 300ms ease-out, opacity 300ms ease-out; } .ds-lead-unit { font-size: .38em; font-weight: 400; color: var(--muted, #c2dcce); } .ds-lead-sub { margin: 10px 0 0; font-family: var(--font-roboto-mono), monospace; font-size: 11px; line-height: 1.6; color: var(--muted, #c2dcce); } .ds-lead-sub b { font-weight: 700; color: var(--foreground, #f2e8d5); } .ds-lead-bar { display: flex; height: 9px; width: 100%; margin-top: 12px; background: var(--men-sau, #082e23); } .ds-lead-fill { height: 100%; background: var(--foreground, #f2e8d5); transition: width 500ms; }"
+    },
+    {
+      "name": "Navigation Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Text labels only, never glyph icons. Active is a full turmeric block with dark ink.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-on\">Ghi &amp; xem</a><a class=\"ds-nav-item\">Giao dịch</a><a class=\"ds-nav-item\">Danh mục</a><a class=\"ds-nav-item\">Ngân sách</a><a class=\"ds-nav-item\">Báo cáo</a></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; } .ds-nav-item { display: flex; align-items: center; height: 44px; padding: 0 14px; font-family: var(--font-oswald), sans-serif; font-size: 15px; font-weight: 400; color: var(--muted, #c2dcce); text-decoration: none; border-radius: 0; cursor: pointer; transition: background-color 120ms, color 120ms; } .ds-nav-item:hover { background: color-mix(in oklab, var(--foreground, #f2e8d5) 8%, transparent); color: var(--foreground, #f2e8d5); } .ds-nav-on { background: var(--accent, #edc948); color: var(--accent-foreground, #3a2e00); font-weight: 600; } .ds-nav-on:hover { background: var(--accent, #edc948); color: var(--accent-foreground, #3a2e00); }"
+    },
+    {
+      "name": "Brand Mark",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "A turmeric square — a paint swatch on the board. Unrounded like everything else in this world.",
+      "html": "<div class=\"ds-brand\"><span class=\"ds-brand-mark\"></span><span class=\"ds-brand-name\">Ví Riêng</span></div>",
+      "css": ".ds-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-oswald), sans-serif; color: var(--foreground, #f2e8d5); } .ds-brand-mark { width: 22px; height: 22px; flex-shrink: 0; background: var(--accent, #edc948); border-radius: 0; } .ds-brand-name { font-size: 17px; font-weight: 600; letter-spacing: .01em; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Bảng Giá Quán — the hand-painted eatery price board",
+    "overview": "This is a sheet of enamelled iron hanging on a Vietnamese eatery wall: moss-green vitreous ground, ivory stencil paint, paper price tags strung on wire. The interface is not a set of cards arranged on a neutral page. It is one continuous painted surface, and the numbers are painted onto it. Structure is read through gaps between painted blocks and through the weight of the paint itself, never through rounded containers, drop shadows, or outlined boxes.\n\nThe system is built for one act: recording a purchase in five seconds while standing in a shop. Everything follows from that. The numeric keypad is always present rather than hidden behind a sheet or a dialog, the leading number is large enough to read across a room, and every supporting label shrinks to a mono whisper so the number owns the screen. Hierarchy is built from extreme size contrast, not from borders or elevation.\n\nTwo themes describe the same physical object under two lighting conditions, not a palette and its inversion. Dark is the board indoors; light is the board in sunlight. In both, the enamel green is still the ground and the ivory paint is still the figure. This figure/ground polarity is the load-bearing invariant of the whole system: an earlier attempt that flipped light mode to dark ink on pale green stopped being a board and became a generic light app with a green tint.",
+    "keyCharacteristics": [
+      "Enamel green owns 40%+ of every screen as a field, never as an accent",
+      "Zero border-radius anywhere; structure reads through gaps and painted blocks",
+      "One enormous number against tiny mono labels; hierarchy by size contrast alone",
+      "Two themes, one object: ivory stays the figure in both",
+      "Capture is always on screen, never behind a layer",
+      "Depth from paint thickness and chipped edges, never from shadow or blur"
+    ],
+    "rules": [
+      {
+        "name": "The Field Rule",
+        "body": "The enamel green is a ground, not an accent. It must occupy roughly 40% or more of any screen. A layout that reduces green to a header bar or a button fill has left this world.",
+        "section": "colors"
+      },
+      {
+        "name": "The Same Board Rule",
+        "body": "Light mode is the board in sunlight, not a color inversion. Ivory paint stays the foreground in both themes. If a change would force text to flip to dark ink on a pale ground, that change is rejected outright.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sunlight Ceiling Rule",
+        "body": "The light-mode enamel value is a measured ceiling, not a preference. It is 2.54x the luminance of the dark board (L .141 vs .056) — bright enough that toggling themes is unmistakable, and the brightest it can be before ivory drops below 4.5:1. Raising it forces dark ink and destroys the polarity. Brightening light mode is a whole-system change, never a one-token edit.",
+        "section": "colors"
+      },
+      {
+        "name": "The Measured Floor Rule",
+        "body": "Every text color here was contrast-measured against the brightest point of the enamel gradient (#14604A in dark), not against the flat token. Dark chalk sits at 5.15:1, light chalk at 4.54:1. These are floors. Do not lower any of them without re-measuring against the gradient peak.",
+        "section": "colors"
+      },
+      {
+        "name": "The Hot Color Rule",
+        "body": "Vermilion means record-or-breach. It is never lightened in light mode — it holds 5.09:1 against white in both themes — because a pale primary action reads as disabled.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three Signal Rule",
+        "body": "Over-budget is never signalled by color alone. It carries color, the word (\"Vượt hạn mức\" / \"Đã vượt\"), and a change in bar direction and fill, simultaneously.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Number Rule",
+        "body": "Exactly one number per screen is allowed to be huge. Hierarchy is built from the gap between that number and the 11px mono labels around it, not from rules, boxes, or weights in between.",
+        "section": "typography"
+      },
+      {
+        "name": "The Label Floor Rule",
+        "body": "Measurement labels are 11px mono, uppercase, .2em tracking — one canonical treatment carried by the .nhan-do utility. 11px is a floor, never smaller, and the tracking is a single value across the entire app. Mixed tracking for the same role is drift, not system.",
+        "section": "typography"
+      },
+      {
+        "name": "The Reach Rule",
+        "body": "Capture is never placed behind a sheet, dialog, or a \"+\" button. On mobile the keypad must remain within thumb reach on open. This replaced a previous design where capture lived behind a sheet, and reintroducing that layer would undo the redesign.",
+        "section": "layout"
+      },
+      {
+        "name": "The No Shadow Rule",
+        "body": "Surfaces never lift off the board, because they are painted onto it. Depth is tonal and textural. A drop shadow, a soft glow, or a blurred backdrop anywhere in this world is a defect.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No Outline Rule",
+        "body": "Never box content in a border to group it. Grouping is done with gaps, tonal fill, and painted blocks. A 1px hairline is permitted only to mark a structural seam.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do let enamel green hold 40%+ of every screen as a field.",
+      "Do keep --radius: 0rem; every shape is a rectangle of paint.",
+      "Do build hierarchy from size contrast — one huge number against 11px mono labels.",
+      "Do set every measurement label as 11px mono, uppercase, .2em tracking (the .nhan-do role).",
+      "Do keep ivory paint as the foreground in both themes.",
+      "Do re-measure contrast against the brightest point of the enamel gradient, not the flat token, before changing any text color.",
+      "Do signal over-budget with color, word, and shape together.",
+      "Do keep the keypad on screen and within thumb reach on mobile.",
+      "Do express selection as a full flood of color, not an outline or a checkmark.",
+      "Do use text labels for navigation."
+    ],
+    "donts": [
+      "Don't add border-radius to anything.",
+      "Don't add drop shadows, soft glows, blur, or backdrop-filter; depth is tonal and textural.",
+      "Don't raise the light-mode enamel value on its own — it is a measured ceiling, and exceeding it forces dark ink and destroys the figure/ground polarity.",
+      "Don't lighten vermilion in light mode; a pale primary action reads as disabled.",
+      "Don't box content in borders to group it; use gaps, tonal fill, and painted blocks.",
+      "Don't put capture behind a sheet, dialog, or \"+\" button.",
+      "Don't signal any state by color alone.",
+      "Don't use glyph icons for navigation.",
+      "Don't introduce a second display face; Oswald must carry Vietnamese diacritics and most condensed alternatives do not.",
+      "Don't mix tracking values for the same label role.",
+      "Don't reintroduce bento card grids, donut charts, or the money-source concept — all were removed in this redesign."
+    ]
+  }
+}

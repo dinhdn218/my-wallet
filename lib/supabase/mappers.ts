@@ -1,6 +1,6 @@
 import type { Category } from '@/lib/categories'
 import type { Budgets } from '@/lib/seed-data'
-import type { AccountId, Transaction, TxType } from '@/types/transaction'
+import type { Transaction, TxType } from '@/types/transaction'
 import type { BudgetRow, CategoryRow, TransactionRow } from './types'
 
 /**
@@ -28,7 +28,6 @@ export function rowToTransaction(row: TransactionRow): Transaction {
     type: row.type as TxType,
     amountVnd: Number(row.amount_vnd),
     categoryId: row.category_id,
-    accountId: row.account_id as AccountId,
     // Cột note là nullable trong DB, còn Transaction dùng `note?: string`.
     note: row.note ?? undefined,
     occurredAt: toIso(row.occurred_at),

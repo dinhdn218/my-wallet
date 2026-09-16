@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from 'react'
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
+import { CotTrai } from '@/components/layout/cot-trai'
 import { PageHeader } from '@/components/layout/page-header'
-import { AmountSkeleton, CardLabel, GlassCard, glass } from '@/components/ui/glass-card'
+import { AmountSkeleton, CardLabel } from '@/components/ui/glass-card'
 import { formatVnd, formatVndShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import {
@@ -50,9 +51,12 @@ export default function ReportPage() {
   const spendLess = comparison.expenseDelta < 0
 
   return (
-    <main className="no-scrollbar flex min-h-0 min-w-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pt-3 md:gap-4 md:p-5 xl:gap-4 xl:p-6 xl:px-[26px]">
-      <PageHeader title="Báo cáo" meta={`Thu chi theo tháng · tới tháng ${monthNo}`} showAddButton={false}>
-        <div className="hidden h-10 items-center gap-1 rounded-[13px] border border-glass-border bg-well p-[3px] sm:flex">
+    <div className="flex min-h-0 flex-1 md:flex-row">
+      <CotTrai />
+
+      <main className="no-scrollbar flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-4 pt-4 pb-4 md:px-8 md:pt-8 md:pb-8">
+      <PageHeader title="Báo cáo" meta={`Thu chi theo tháng · tới tháng ${monthNo}`}>
+        <div className="hidden h-9 items-center gap-px bg-men-sau p-px sm:flex">
           {RANGES.map((range) => (
             <button
               key={range.id}
@@ -60,10 +64,10 @@ export default function ReportPage() {
               onClick={() => setRangeId(range.id)}
               aria-pressed={rangeId === range.id}
               className={cn(
-                'h-full rounded-[10px] px-3 text-[12.5px] transition-colors duration-[120ms]',
+                'h-full px-3 text-[15px] transition-colors duration-[120ms]',
                 rangeId === range.id
-                  ? 'bg-accent font-extrabold text-accent-foreground'
-                  : 'font-bold text-muted hover:text-foreground',
+                  ? 'bg-accent font-semibold text-accent-foreground'
+                  : 'font-normal text-muted hover:text-foreground',
               )}
             >
               {range.label}
@@ -73,16 +77,16 @@ export default function ReportPage() {
       </PageHeader>
 
       {/* Thu & chi theo tháng */}
-      <GlassCard className="rounded-[20px] p-3.5 px-4 md:rounded-[22px] md:p-[18px] md:px-5 xl:h-[396px] xl:p-5 xl:px-[22px]">
+      <section className="mt-6 flex flex-col">
         <div className="flex items-center justify-between gap-3">
           <CardLabel>Thu &amp; chi theo tháng</CardLabel>
-          <div className="flex items-center gap-3.5 text-[12px] font-semibold text-muted">
+          <div className="flex items-center gap-3.5 text-[11px] font-semibold text-muted">
             <span className="flex items-center gap-1.5">
-              <span className="size-2.5 rounded-[3px] bg-positive" aria-hidden />
+              <span className="size-2.5 bg-accent" aria-hidden />
               Thu
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="size-2.5 rounded-[3px] bg-accent" aria-hidden />
+              <span className="size-2.5 bg-foreground" aria-hidden />
               Chi
             </span>
           </div>
@@ -91,7 +95,7 @@ export default function ReportPage() {
         {!hasHydrated ? (
           <AmountSkeleton className="mt-4 h-[200px] w-full xl:h-[240px]" />
         ) : (
-          <div className="mt-4 h-[200px] xl:h-auto xl:min-h-0 xl:flex-1">
+          <div className="mt-4 h-[220px] xl:h-[300px]">
             {/* flex-1 chỉ dùng ở xl, nơi thẻ có chiều cao xác định (396px).
                 Ở khổ nhỏ thẻ cao theo nội dung, flex-basis:0 sẽ thắng
                 h-[200px] và làm biểu đồ co về 0. */}
@@ -109,21 +113,21 @@ export default function ReportPage() {
                     fontWeight: 700,
                   }}
                 />
-                <Tooltip cursor={{ fill: 'color-mix(in oklab, var(--foreground) 6%, transparent)' }} content={<ChartTooltip />} />
-                <Bar dataKey="income" barSize={15} radius={5} isAnimationActive={false}>
-                  {series.map((point, index) => (
-                    <Cell
-                      key={point.month}
-                      fill="var(--positive)"
-                      fillOpacity={index === series.length - 1 ? 1 : 0.5}
-                    />
-                  ))}
-                </Bar>
-                <Bar dataKey="expense" barSize={15} radius={5} isAnimationActive={false}>
+                <Tooltip cursor={{ fill: 'color-mix(in oklab, var(--foreground) 8%, transparent)' }} content={<ChartTooltip />} />
+                <Bar dataKey="income" barSize={15} radius={0} isAnimationActive={false}>
                   {series.map((point, index) => (
                     <Cell
                       key={point.month}
                       fill="var(--accent)"
+                      fillOpacity={index === series.length - 1 ? 1 : 0.5}
+                    />
+                  ))}
+                </Bar>
+                <Bar dataKey="expense" barSize={15} radius={0} isAnimationActive={false}>
+                  {series.map((point, index) => (
+                    <Cell
+                      key={point.month}
+                      fill="var(--foreground)"
                       fillOpacity={index === series.length - 1 ? 1 : 0.5}
                     />
                   ))}
@@ -133,25 +137,25 @@ export default function ReportPage() {
           </div>
         )}
 
-        <div className="mt-4 grid shrink-0 grid-cols-3 gap-3 border-t border-line pt-3">
+        <div className="mt-5 grid shrink-0 grid-cols-3 gap-3 border-t-2 border-foreground pt-4">
           <Stat label="Thu TB" value={averages.income} ready={hasHydrated} />
           <Stat label="Chi TB" value={averages.expense} ready={hasHydrated} />
           <div className="flex flex-col gap-1">
-            <span className="text-[11.5px] font-semibold text-muted">Tiết kiệm</span>
+            <span className="font-mono text-[11px] text-muted">Tiết kiệm</span>
             {hasHydrated ? (
-              <span className="text-[16px] font-extrabold text-positive tabular-nums">
+              <span className="text-[19px] font-semibold text-accent tabular-nums">
                 {Math.round(averages.savingRate * 100)}%
               </span>
             ) : (
-              <AmountSkeleton className="h-[16px] w-16" />
+              <AmountSkeleton className="h-[18px] w-16" />
             )}
           </div>
         </div>
-      </GlassCard>
+      </section>
 
       {/* Hai thẻ dưới */}
-      <div className="grid gap-3 pb-1 md:gap-4 lg:grid-cols-2">
-        <GlassCard className="rounded-[20px] p-3.5 px-4 md:rounded-[22px] md:p-[18px] md:px-5 xl:p-5 xl:px-[22px]">
+      <div className="mt-9 grid gap-9 pb-1 lg:grid-cols-2 lg:gap-8">
+        <section className="flex flex-col">
           <CardLabel>
             Tháng {monthNo} so tháng {prevMonthNo}
           </CardLabel>
@@ -159,7 +163,7 @@ export default function ReportPage() {
           {!hasHydrated ? (
             <AmountSkeleton className="mt-4 h-24 w-full" />
           ) : comparison.previous.expense === 0 ? (
-            <p className="mt-4 text-[14px] font-medium text-muted text-pretty">
+            <p className="mt-4 text-[15px] text-muted text-pretty">
               Tháng {prevMonthNo} chưa có khoản chi nào để so sánh.
             </p>
           ) : (
@@ -167,10 +171,10 @@ export default function ReportPage() {
               <div className="mt-3.5 flex flex-wrap items-center gap-2.5">
                 <span
                   className={cn(
-                    'rounded-full border px-2.5 py-1 text-[11.5px] font-extrabold tabular-nums',
+                    'px-2.5 py-1 text-[11px] font-semibold tabular-nums',
                     spendLess
-                      ? 'border-positive/45 bg-positive/14 text-positive'
-                      : 'border-negative/45 bg-negative/14 text-negative',
+                      ? 'bg-accent text-accent-foreground'
+                      : 'bg-negative text-negative-foreground',
                   )}
                 >
                   {spendLess ? 'Chi ít hơn' : 'Chi nhiều hơn'}{' '}
@@ -179,7 +183,7 @@ export default function ReportPage() {
                     .replace('.', ',')}
                   %
                 </span>
-                <span className="text-[17px] font-extrabold tabular-nums">
+                <span className="text-[19px] font-semibold tabular-nums">
                   {formatVnd(comparison.expenseDelta, { sign: true })}
                 </span>
               </div>
@@ -191,17 +195,17 @@ export default function ReportPage() {
                   return (
                     <li key={row.categoryId} className="flex items-center gap-2.5">
                       <span
-                        className="size-[9px] shrink-0 rounded-full"
+                        className="size-2 shrink-0"
                         style={{ background: category.color }}
                         aria-hidden
                       />
-                      <span className="min-w-0 flex-1 text-[13.5px] font-bold text-pretty">
+                      <span className="min-w-0 flex-1 text-[15px] text-pretty">
                         {category.label}
                       </span>
                       {row.share !== null && (
                         <span
                           className={cn(
-                            'shrink-0 text-[12.5px] font-extrabold tabular-nums',
+                            'shrink-0 text-[15px] font-semibold tabular-nums',
                             down ? 'text-positive' : 'text-negative',
                           )}
                         >
@@ -209,7 +213,7 @@ export default function ReportPage() {
                           {Math.abs(row.share * 100).toFixed(0)}%
                         </span>
                       )}
-                      <span className="w-[110px] shrink-0 text-right text-[13.5px] font-extrabold tabular-nums">
+                      <span className="w-[110px] shrink-0 text-right text-[15px] font-semibold tabular-nums">
                         {formatVnd(row.delta, { sign: true })}
                       </span>
                     </li>
@@ -218,15 +222,15 @@ export default function ReportPage() {
               </ul>
             </>
           )}
-        </GlassCard>
+        </section>
 
-        <GlassCard className="rounded-[20px] p-3.5 px-4 md:rounded-[22px] md:p-[18px] md:px-5 xl:p-5 xl:px-[22px]">
+        <section className="flex flex-col">
           <CardLabel>Chi lớn nhất tháng {monthNo}</CardLabel>
 
           {!hasHydrated ? (
             <AmountSkeleton className="mt-4 h-24 w-full" />
           ) : biggest.length === 0 ? (
-            <p className="mt-4 text-[14px] font-medium text-muted">
+            <p className="mt-4 text-[15px] text-muted">
               Tháng này chưa có khoản chi nào.
             </p>
           ) : (
@@ -236,14 +240,14 @@ export default function ReportPage() {
                 return (
                   <li key={row.id} className="flex items-center gap-2.5">
                     <span
-                      className="size-[9px] shrink-0 rounded-full"
+                      className="size-2 shrink-0"
                       style={{ background: category.color }}
                       aria-hidden
                     />
-                    <span className="min-w-0 flex-1 text-[14px] font-bold text-pretty">
+                    <span className="min-w-0 flex-1 text-[15px] text-pretty">
                       {row.note ?? category.label}
                     </span>
-                    <span className="shrink-0 text-[14px] font-extrabold tabular-nums">
+                    <span className="shrink-0 text-[16px] font-semibold tabular-nums">
                       {formatVnd(row.amountVnd)}
                     </span>
                   </li>
@@ -252,27 +256,28 @@ export default function ReportPage() {
             </ul>
           )}
 
-          <div className="mt-auto border-t border-line pt-3">
-            <a href="/giao-dich" className="text-[12.5px] font-extrabold text-accent">
+          <div className="mt-5 border-t border-men-vien pt-3">
+            <a href="/giao-dich" className="text-[15px] font-semibold text-accent underline underline-offset-4">
               Xem tất cả giao dịch →
             </a>
           </div>
-        </GlassCard>
+        </section>
       </div>
-    </main>
+      </main>
+    </div>
   )
 }
 
 function Stat({ label, value, ready }: { label: string; value: number; ready: boolean }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[11.5px] font-semibold text-muted">{label}</span>
+      <span className="font-mono text-[11px] text-muted">{label}</span>
       {ready ? (
-        <span className="text-[16px] font-extrabold tabular-nums">
+        <span className="text-[19px] font-semibold tabular-nums">
           {formatVndShort(value)}
         </span>
       ) : (
-        <AmountSkeleton className="h-[16px] w-16" />
+        <AmountSkeleton className="h-[18px] w-16" />
       )}
     </div>
   )
@@ -294,14 +299,14 @@ function ChartTooltip({
   const expense = payload.find((p) => p.dataKey === 'expense')?.value ?? 0
 
   return (
-    <div className={cn(glass, 'rounded-[13px] px-3 py-2')}>
-      <p className="font-mono text-[10.5px] font-bold tracking-[.16em] text-muted uppercase">
+    <div className="bg-men-sau px-3 py-2">
+      <p className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
         {label}
       </p>
-      <p className="mt-1 text-[13px] font-extrabold text-positive tabular-nums">
+      <p className="mt-1 text-[15px] font-semibold text-accent tabular-nums">
         Thu {formatVnd(income)}
       </p>
-      <p className="text-[13px] font-extrabold text-accent tabular-nums">
+      <p className="text-[15px] font-semibold tabular-nums">
         Chi {formatVnd(expense)}
       </p>
     </div>

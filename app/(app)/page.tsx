@@ -1,71 +1,159 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { BalanceCard } from '@/components/dashboard/balance-card'
-import { CashflowCard } from '@/components/dashboard/cashflow-card'
-import { CategoryBreakdown } from '@/components/dashboard/category-breakdown'
-import { RecentTransactions } from '@/components/dashboard/recent-transactions'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useState } from 'react'
+import { ConTieuDuoc } from '@/components/dashboard/con-tieu-duoc'
+import { EmptyState } from '@/components/dashboard/empty-state'
+import { Brand } from '@/components/layout/brand'
 import { MonthPicker } from '@/components/layout/month-picker'
-import { TransactionSheet } from '@/components/transaction/transaction-sheet'
-import { createClient } from '@/lib/supabase/client'
+import { NAV_ITEMS, isActive } from '@/components/layout/nav-items'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
+import { DongGia, NhanNgay, groupByDay } from '@/components/transaction/dong-gia'
+import { GhiNhanh } from '@/components/transaction/ghi-nhanh'
+import { TransactionEdit } from '@/components/transaction/transaction-edit'
+import { AmountSkeleton } from '@/components/ui/glass-card'
+import { formatVnd } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import {
+  useCategoryLookup,
+  useExpenseStore,
+  useMonthlySummary,
+  useRecentTransactions,
+} from '@/store/useExpenseStore'
 
-export default function DashboardPage() {
-  const [email, setEmail] = useState<string | null>(null)
+/**
+ * Màn chính — tấm bảng giá.
+ *
+ * Bố cục là điều khác biệt lớn nhất so với bản cũ:
+ *   mobile  → cột số ở trên, bàn phím ghi ở dưới, gõ được ngay khi mở app
+ *   desktop → cột trái giữ số + bàn phím, cột phải là bảng giá theo ngày
+ *
+ * Không có lưới bento, không thẻ bo góc. Việc GHI chiếm chỗ tốt nhất của màn
+ * hình vì đó là việc người dùng làm hàng chục lần mỗi tháng.
+ */
+export default function TrangChinh() {
+  // Số đang gõ dở ở bàn phím, nâng lên đây để con số lớn tụt xuống theo.
+  const [pending, setPending] = useState(0)
+  const hasHydrated = useExpenseStore((s) => s.hasHydrated)
+  const activeMonth = useExpenseStore((s) => s.activeMonth)
+  const lookup = useCategoryLookup()
+  const { expense } = useMonthlySummary()
+  const rows = useRecentTransactions(40)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
-  useEffect(() => {
-    let cancelled = false
-    void createClient()
-      .auth.getUser()
-      .then(({ data }) => {
-        if (!cancelled) setEmail(data.user?.email ?? null)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const groups = groupByDay(rows)
+  const thang = Number(activeMonth.split('-')[1])
+  const nam = activeMonth.split('-')[0]
 
   return (
-    <main className="no-scrollbar flex min-h-0 min-w-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pt-3 md:gap-4 md:p-5 xl:gap-[18px] xl:p-6">
-      {/* Đầu trang — mobile đã có header riêng ở khung ngoài */}
-      <header className="hidden items-end justify-between gap-5 md:flex">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-[23px] leading-none font-extrabold tracking-[-.015em] xl:text-[26px]">
-            Tổng quan
-          </h1>
-          <p className="text-[12.5px] font-medium text-muted xl:text-[13px]">
-            {email ? `${email} · đã đồng bộ` : 'Đã đồng bộ'}
-          </p>
+    <main className="flex min-h-0 flex-1 flex-col md:flex-row">
+      {/* ---------- Cột ghi: trái ở desktop, dưới ở mobile ---------- */}
+      <div className="no-scrollbar mep-men order-2 flex shrink-0 flex-col overflow-y-auto bg-men-dam px-4 pt-3 pb-3 md:order-1 md:h-dvh md:w-[360px] md:overflow-y-auto md:px-7 md:py-6 xl:w-[400px] xl:px-8">
+        <Brand className="hidden shrink-0 md:flex" />
+        <ConTieuDuoc pending={pending} className="mt-[clamp(14px,3vh,28px)] hidden shrink-0 md:flex" />
+        <GhiNhanh onPendingChange={setPending} className="md:mt-[clamp(12px,2.2vh,24px)] md:min-h-0 md:flex-1" />
+
+        <div className="mt-[clamp(8px,1.5vh,16px)] hidden shrink-0 flex-col md:flex">
+          <ThemeToggle size="desktop" />
         </div>
-
-        <div className="flex items-center gap-2.5">
-          <MonthPicker />
-
-          <TransactionSheet
-            label="+ Thêm giao dịch"
-            triggerClassName="hidden xl:flex"
-          />
-        </div>
-      </header>
-
-      {/*
-        Bento:
-        mobile  -> 1 cột, thu/chi tách 2 ô nhỏ
-        tablet  -> 2 cột, số dư span 2
-        desktop -> 6 cột × 2 hàng (208px / 552px)
-      */}
-      <div
-        className={cn(
-          'grid grid-cols-1 gap-3 pb-1',
-          'md:grid-cols-2 md:grid-rows-[190px_296px_1fr] md:gap-3.5',
-          'xl:grid-cols-6 xl:grid-rows-[208px_552px] xl:gap-4',
-        )}
-      >
-        <BalanceCard className="md:col-span-2 xl:col-span-3" />
-        <CashflowCard className="md:col-span-1 xl:col-span-3" />
-        <CategoryBreakdown className="md:col-span-1 xl:col-span-2 xl:row-start-2" />
-        <RecentTransactions className="md:col-span-2 xl:col-span-4 xl:col-start-3 xl:row-start-2" />
       </div>
+
+      {/* ---------- Cột bảng giá: phải ở desktop, trên ở mobile ---------- */}
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col px-4 pt-3 md:order-2 md:px-8 md:pt-8 md:pb-8">
+        {/* Con số dẫn đầu — mobile hiện ở đây, desktop đã có ở cột trái */}
+        <ConTieuDuoc compact pending={pending} className="md:hidden" />
+
+        <header className="mt-6 hidden items-baseline justify-between gap-5 md:flex">
+          <h1 className="text-[27px] leading-none font-semibold tracking-[-.01em]">
+            Tháng {thang}, {nam}
+          </h1>
+          <div className="flex items-center gap-3">
+            <MonthPicker />
+            <span className="font-mono text-[11px] tracking-[.2em] text-muted uppercase">
+              {hasHydrated ? `${rows.length} khoản` : '…'}
+            </span>
+          </div>
+        </header>
+
+        <NavNgang className="mt-5 hidden md:flex" />
+
+        <div className="mt-5 hidden h-px bg-men-vien md:block" />
+
+        {/* Bảng giá theo ngày — vùng cuộn riêng, để dòng kết sổ luôn ở đáy */}
+        <div className="no-scrollbar mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto md:mt-2">
+          {!hasHydrated ? (
+            <div className="flex flex-col gap-3 pt-2">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <AmountSkeleton
+                  key={i}
+                  className="h-[22px] w-full"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                />
+              ))}
+            </div>
+          ) : rows.length === 0 ? (
+            <EmptyState />
+          ) : (
+            groups.map((group) => (
+              <section key={group.label}>
+                <NhanNgay>{group.label}</NhanNgay>
+                {group.rows.map((row) => (
+                  <DongGia
+                    key={row.id}
+                    row={row}
+                    lookup={lookup}
+                    onClick={() => setEditingId(row.id)}
+                    data-testid={`tx-row-${row.id}`}
+                  />
+                ))}
+              </section>
+            ))
+          )}
+        </div>
+
+        {/* Tổng cuối bảng — dòng kết sổ */}
+        {hasHydrated && rows.length > 0 && (
+          <div className="mt-6 hidden shrink-0 items-baseline gap-3 border-t-2 border-foreground pt-4 pb-2 md:flex">
+            <span className="font-mono text-[11px] tracking-[.2em] text-muted uppercase">
+              Chi tháng {thang}
+            </span>
+            <span aria-hidden className="duong-cham mb-[3px] h-px flex-1 self-center" />
+            <span className="text-[27px] font-semibold tracking-[-.025em] tabular-nums">
+              {formatVnd(expense)}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <TransactionEdit id={editingId} onClose={() => setEditingId(null)} />
     </main>
+  )
+}
+
+/** Điều hướng ngang — chỉ desktop; mobile dùng thanh tab dưới. */
+function NavNgang({ className }: { className?: string }) {
+  const pathname = usePathname()
+  return (
+    <nav className={cn('flex flex-wrap gap-px', className)}>
+      {NAV_ITEMS.map((item) => {
+        const active = isActive(item.href, pathname)
+        return (
+          <Link
+            key={item.id}
+            href={item.href}
+            aria-current={active ? 'page' : undefined}
+            className={cn(
+              'px-4 py-2 text-[15px] transition-colors duration-[120ms]',
+              active
+                ? 'bg-accent font-semibold text-accent-foreground'
+                : 'font-normal text-muted hover:bg-foreground/8 hover:text-foreground',
+            )}
+          >
+            {item.label}
+          </Link>
+        )
+      })}
+    </nav>
   )
 }

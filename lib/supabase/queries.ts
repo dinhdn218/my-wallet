@@ -66,7 +66,6 @@ export async function insertTransaction(
       type: input.type,
       amount_vnd: input.amountVnd,
       category_id: input.categoryId,
-      account_id: input.accountId,
       note: input.note ?? null,
       occurred_at: input.occurredAt,
     })
@@ -87,7 +86,6 @@ export async function updateTransactionRow(
   if (patch.type !== undefined) row.type = patch.type
   if (patch.amountVnd !== undefined) row.amount_vnd = patch.amountVnd
   if (patch.categoryId !== undefined) row.category_id = patch.categoryId
-  if (patch.accountId !== undefined) row.account_id = patch.accountId
   if (patch.note !== undefined) row.note = patch.note ?? null
   if (patch.occurredAt !== undefined) row.occurred_at = patch.occurredAt
 

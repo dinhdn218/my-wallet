@@ -8,7 +8,6 @@ const txRow = (over: Partial<TransactionRow> = {}): TransactionRow => ({
   type: 'expense',
   amount_vnd: 65_000,
   category_id: 'cafe',
-  account_id: 'cash',
   note: 'Cafe Highlands',
   occurred_at: '2026-09-03T02:12:00+00:00',
   created_at: '2026-09-03T02:12:00+00:00',
@@ -20,7 +19,6 @@ describe('rowToTransaction', () => {
     const tx = rowToTransaction(txRow())
     expect(tx.amountVnd).toBe(65_000)
     expect(tx.categoryId).toBe('cafe')
-    expect(tx.accountId).toBe('cash')
   })
 
   it('note null thành undefined, không phải chuỗi "null"', () => {

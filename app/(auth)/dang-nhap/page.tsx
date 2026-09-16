@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Brand } from '@/components/layout/brand'
-import { GlassCard } from '@/components/ui/glass-card'
 import { createClient } from '@/lib/supabase/client'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
@@ -42,39 +41,39 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-dvh items-center justify-center p-4">
-      <GlassCard className="w-full max-w-[400px] p-6 md:p-7">
+      <section className="w-full max-w-[400px] bg-men-dam p-7 md:p-8">
         <Brand />
 
-        <h1 className="mt-6 text-[24px] leading-tight font-extrabold tracking-[-.02em]">
+        <h1 className="mt-7 text-[27px] leading-tight font-semibold tracking-[-.02em]">
           Đăng nhập
         </h1>
-        <p className="mt-2 text-[13.5px] leading-relaxed text-muted">
+        <p className="mt-2.5 text-[15px] leading-relaxed text-muted text-pretty">
           Nhập email để nhận liên kết đăng nhập. Không cần mật khẩu.
         </p>
 
         {status === 'sent' ? (
           <div
             role="status"
-            className="mt-6 rounded-[14px] border border-positive/45 bg-positive/10 p-4"
+            className="mt-7 border-2 border-accent bg-accent/12 p-4"
           >
-            <p className="text-[13.5px] font-bold text-positive">
+            <p className="text-[15px] font-semibold text-accent">
               Đã gửi liên kết tới {email.trim()}
             </p>
-            <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted">
+            <p className="mt-1.5 text-[15px] leading-relaxed text-muted text-pretty">
               Mở hộp thư và bấm vào liên kết để vào app. Liên kết chỉ dùng được
               một lần.
             </p>
             <button
               type="button"
               onClick={() => setStatus('idle')}
-              className="mt-3 text-[12.5px] font-bold text-accent underline underline-offset-4"
+              className="mt-3 text-[15px] font-semibold text-accent underline underline-offset-4"
             >
               Gửi lại hoặc đổi email
             </button>
           </div>
         ) : (
-          <form onSubmit={submit} className="mt-6 flex flex-col gap-3">
-            <label htmlFor="email" className="text-[12.5px] font-bold text-muted">
+          <form onSubmit={submit} className="mt-7 flex flex-col gap-2.5">
+            <label htmlFor="email" className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
               Email
             </label>
             <input
@@ -87,14 +86,14 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               disabled={sending}
               placeholder="ban@email.com"
-              className="h-11 w-full rounded-[13px] border border-glass-border bg-well px-3.5 text-[14.5px] outline-none transition-colors placeholder:text-muted/60 focus-visible:border-accent disabled:opacity-60"
+              className="h-[52px] w-full bg-men-sau px-3.5 text-[15px] outline-none transition-colors placeholder:text-muted/70 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset disabled:opacity-60"
             />
 
             {status === 'error' && (
-              <p role="alert" className="text-[12.5px] font-semibold text-negative">
+              <p role="alert" className="text-[15px] font-medium text-negative">
                 Không gửi được liên kết. Kiểm tra lại email rồi thử lần nữa.
                 {reason && (
-                  <span className="mt-1 block font-medium text-negative/80">
+                  <span className="mt-1 block font-normal text-negative/85">
                     {reason}
                   </span>
                 )}
@@ -104,13 +103,13 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={sending}
-              className="mt-1 h-11 rounded-[13px] bg-accent text-[14.5px] font-extrabold text-accent-foreground transition-opacity disabled:opacity-60"
+              className="mt-2 h-[52px] bg-accent text-[16px] font-semibold text-accent-foreground transition-[filter] hover:brightness-110 disabled:opacity-60"
             >
               {sending ? 'Đang gửi…' : 'Gửi liên kết đăng nhập'}
             </button>
           </form>
         )}
-      </GlassCard>
+      </section>
     </main>
   )
 }

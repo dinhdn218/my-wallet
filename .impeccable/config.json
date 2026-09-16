@@ -1,0 +1,18 @@
+{
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "glow-halo",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/bang-gia-quan.html"
+        ],
+        "createdAt": "2026-09-16T08:04:47.453Z",
+        "reason": "Ánh men tráng của mặt bảng — vật liệu chính của thế giới Bảng Giá Quán, ghi trong khối OWN-WORLD của direction contract; không phải halo trang trí"
+      }
+    ]
+  }
+}

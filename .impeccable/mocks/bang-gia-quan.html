@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ví Riêng — Bảng Giá Quán (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --men:#0F4C3A;          /* men sắt xanh rêu — mặt bảng */
+  --men-dam:#0A382B;      /* men tối hơn, vùng lõm */
+  --son:#F2E8D5;          /* sơn trắng ngà */
+  --son-mo:#F2E8D5A6;
+  --do:#C9301A;           /* đỏ son — vượt hạn mức, nút ghi */
+  --vang:#EDC948;         /* vàng nghệ — khoản thu */
+  --kem:#E8DCC4;          /* nền giấy cho vùng sáng */
+  --kem-dam:#D9C9A8;
+  --muc:#1A1714;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#14100C;color:var(--son);font-family:'Oswald',system-ui,sans-serif}
+body{padding:40px 20px 80px}
+
+.mono{font-family:'Roboto Mono',ui-monospace,monospace}
+
+/* ---------- vệt sơn: mép men sứt, không dùng border ---------- */
+.men{
+  background:
+    radial-gradient(120% 90% at 18% 4%, #14604A 0%, transparent 58%),
+    radial-gradient(90% 70% at 86% 92%, #0B3B2D 0%, transparent 60%),
+    var(--men);
+  position:relative;
+}
+.men::after{ /* hạt men lấm tấm */
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.16;
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, #fff, transparent),
+    radial-gradient(1px 1px at 47% 61%, #fff, transparent),
+    radial-gradient(1px 1px at 78% 33%, #fff, transparent),
+    radial-gradient(1px 1px at 63% 84%, #fff, transparent),
+    radial-gradient(1px 1px at 29% 77%, #fff, transparent),
+    radial-gradient(1px 1px at 91% 58%, #fff, transparent);
+}
+
+h2.sec{
+  font-size:13px;letter-spacing:.34em;text-transform:uppercase;
+  color:#A89C86;margin:0 0 14px 2px;font-weight:500;
+  font-family:'Roboto Mono',monospace;
+}
+.wrap{max-width:1560px;margin:0 auto}
+.row{display:flex;gap:44px;align-items:flex-start;flex-wrap:wrap}
+
+/* =================== MOBILE =================== */
+.phone{
+  width:390px;height:844px;flex:0 0 390px;
+  border-radius:38px;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;
+  box-shadow:0 26px 70px -18px rgba(0,0,0,.8);
+}
+.statusbar{
+  height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 26px;font-size:13px;font-weight:500;color:var(--son);z-index:2;
+}
+
+/* --- nửa trên: mặt bảng --- */
+.board{flex:1 1 auto;display:flex;flex-direction:column;padding:8px 22px 0;z-index:2;min-height:0}
+.board .thang{
+  font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#C2DCCE;font-weight:500;
+}
+.board .sotien{
+  font-size:88px;line-height:.86;font-weight:600;letter-spacing:-.035em;
+  margin-top:10px;display:flex;align-items:baseline;gap:6px;
+  /* vệt cọ hở chân nét */
+  text-shadow:0 2px 0 rgba(0,0,0,.28);
+}
+.board .sotien .dv{font-size:34px;font-weight:400;color:var(--son-mo);letter-spacing:0}
+.board .phu{
+  margin-top:12px;font-family:'Roboto Mono',monospace;font-size:11px;
+  color:#C2DCCE;letter-spacing:.06em;line-height:1.5;
+}
+.board .phu b{color:var(--son);font-weight:700}
+
+/* thanh tiến độ — vệt sơn, không bo tròn */
+.vach{margin-top:14px;height:9px;background:#0A382B;display:flex;overflow:hidden}
+.vach i{display:block;height:100%;background:var(--son)}
+.vach i.qua{background:var(--do)}
+
+/* thẻ giá danh mục treo dây kẽm */
+.treo{margin-top:22px;min-height:0}
+.day{height:1px;background:#2E6B55;margin-bottom:0;position:relative}
+.the-row{display:flex;gap:9px;overflow-x:auto;padding-top:0;scrollbar-width:none}
+.the-row::-webkit-scrollbar{display:none}
+.the{
+  flex:0 0 auto;min-width:78px;padding:9px 12px 11px;background:var(--kem);color:var(--muc);
+  position:relative;margin-top:11px;
+}
+.the::before{ /* dây kẽm */
+  content:'';position:absolute;top:-11px;left:50%;width:1px;height:11px;background:#2E6B55;
+}
+.the::after{ /* lỗ xỏ dây */
+  content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);
+  width:5px;height:5px;border-radius:50%;background:#0F4C3A33;
+}
+.the .ten{font-size:12.5px;font-weight:500;margin-top:7px;line-height:1.1}
+.the .gia{font-size:15px;font-weight:600;letter-spacing:-.01em;margin-top:2px}
+.the.chon{background:var(--vang)}
+.the.chon .gia{color:#3A2E00}
+
+/* vừa ghi — vài dòng gần nhất ngay trên bàn phím */
+.vua-ghi{margin-top:20px;display:flex;flex-direction:column}
+.vg-nhan{
+  font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:#C2DCCE;margin-bottom:5px;
+}
+.vg{display:flex;align-items:baseline;gap:9px;padding:6px 0}
+.vg .cham{width:7px;height:7px;flex:0 0 7px;align-self:center}
+.vg .t{font-size:14.5px;font-weight:400;letter-spacing:.005em}
+.vg .d{flex:1;height:1px;align-self:center;margin-bottom:3px;
+  background-image:radial-gradient(circle,#3C7D64 1px,transparent 1px);
+  background-size:6px 1px;background-repeat:repeat-x}
+.vg .s{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.vg .s.thu{color:var(--vang)}
+
+/* --- nửa dưới: bàn phím sơn stencil --- */
+.pad{
+  flex:0 0 404px;background:#0A382B;padding:12px 14px 10px;z-index:2;
+  display:flex;flex-direction:column;gap:9px;
+}
+.pad .nhap{
+  height:54px;display:flex;align-items:center;justify-content:flex-end;
+  padding:0 14px;font-size:38px;font-weight:600;letter-spacing:-.02em;color:var(--son);
+  background:#082E23;
+}
+.pad .nhap .caret{width:3px;height:34px;background:var(--vang);margin-left:5px;animation:bl 1.05s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1}
+.k{
+  display:flex;align-items:center;justify-content:center;
+  background:#11553F;color:var(--son);font-size:27px;font-weight:500;
+  user-select:none;
+}
+.k.u{font-size:19px;font-weight:600;color:var(--vang);letter-spacing:.02em}
+.k.x{font-size:20px}
+.ghi{
+  height:58px;background:var(--do);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+}
+
+/* =================== DESKTOP =================== */
+.desk{
+  flex:1 1 880px;min-width:880px;height:844px;display:flex;overflow:hidden;
+  box-shadow:0 26px 70px -18px rgba(0,0,0,.8);position:relative;
+}
+/* cột trái: số + bàn phím */
+.dleft{
+  flex:0 0 400px;padding:34px 30px 26px;display:flex;flex-direction:column;z-index:2;
+  background:#0A382B;
+}
+.dleft .brand{
+  display:flex;align-items:center;gap:10px;font-size:17px;font-weight:600;letter-spacing:.01em;
+}
+.dleft .brand .mark{width:22px;height:22px;background:var(--vang);flex:0 0 22px}
+.dleft .thang{margin-top:34px;font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#C2DCCE}
+.dleft .sotien{font-size:76px;line-height:.86;font-weight:600;letter-spacing:-.035em;margin-top:9px;display:flex;align-items:baseline;gap:5px}
+.dleft .sotien .dv{font-size:29px;font-weight:400;color:var(--son-mo)}
+.dleft .phu{margin-top:11px;font-family:'Roboto Mono',monospace;font-size:11px;color:#C2DCCE;line-height:1.55}
+.dleft .phu b{color:var(--son);font-weight:700}
+.dkeys{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.dnhap{height:52px;display:flex;align-items:center;justify-content:flex-end;padding:0 13px;background:#082E23;font-size:34px;font-weight:600;color:var(--son)}
+.dnhap .caret{width:3px;height:30px;background:var(--vang);margin-left:5px;animation:bl 1.05s steps(1) infinite}
+
+/* cột phải: bảng giá theo ngày */
+.dright{flex:1;padding:34px 34px 0;overflow:hidden;z-index:2;display:flex;flex-direction:column}
+.dhead{display:flex;align-items:baseline;justify-content:space-between;gap:20px}
+.dhead .t{font-size:27px;font-weight:600;letter-spacing:-.01em}
+.dnav{display:flex;gap:2px;margin-top:18px}
+.dnav a{
+  padding:8px 15px;font-size:13.5px;font-weight:500;color:#C2DCCE;text-decoration:none;
+  letter-spacing:.02em;
+}
+.dnav a.on{background:var(--son);color:var(--men);font-weight:600}
+.dsep{height:1px;background:#2E6B55;margin:16px 0 0}
+
+.ngay{margin-top:20px}
+.ngay .nh{
+  font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:#C2DCCE;margin-bottom:7px;
+}
+.dong{
+  display:flex;align-items:baseline;gap:14px;padding:9px 0;
+}
+.dong .cham{width:8px;height:8px;flex:0 0 8px;align-self:center}
+.dong .ten{font-size:17px;font-weight:400;letter-spacing:.005em;flex:0 0 auto}
+.dong .dot{
+  flex:1;height:1px;align-self:center;margin-bottom:3px;
+  background-image:radial-gradient(circle,#2E6B55 1px,transparent 1px);
+  background-size:6px 1px;background-repeat:repeat-x;
+}
+.dong .dm{font-family:'Roboto Mono',monospace;font-size:11px;color:#C2DCCE;letter-spacing:.08em;text-transform:uppercase}
+.dong .so{font-size:20px;font-weight:600;letter-spacing:-.015em;min-width:132px;text-align:right}
+.dong .so.thu{color:var(--vang)}
+
+/* tổng cuối bảng */
+.tong{
+  margin-top:auto;padding:16px 0 22px;display:flex;align-items:baseline;gap:14px;
+  border-top:2px solid var(--son);
+}
+.tong .l{font-size:14px;letter-spacing:.2em;text-transform:uppercase;font-family:'Roboto Mono',monospace;color:#C2DCCE}
+.tong .dot{flex:1;height:1px;align-self:center;background-image:radial-gradient(circle,#2E6B55 1px,transparent 1px);background-size:6px 1px;background-repeat:repeat-x}
+.tong .so{font-size:32px;font-weight:600;letter-spacing:-.025em}
+
+.note{max-width:760px;margin:52px auto 0;color:#A89C86;font-size:14px;line-height:1.75;font-family:'Roboto Mono',monospace}
+.note b{color:var(--son);font-weight:500}
+.note ul{margin:10px 0 0 18px}
+.note li{margin:5px 0}
+@media(max-width:1400px){.desk{min-width:0;flex:1 1 100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2 class="sec">Ví Riêng · Bảng Giá Quán · mockup 1 / mobile 390 · desktop 1440</h2>
+  <div class="row">
+
+    <!-- ================= MOBILE ================= -->
+    <div class="phone men">
+      <div class="statusbar"><span>9:41</span><span class="mono" style="font-size:11px;letter-spacing:.1em">THÁNG 9</span></div>
+
+      <div class="board">
+        <div class="thang">Còn tiêu được tháng 9</div>
+        <div class="sotien">2.365.000<span class="dv">đ</span></div>
+        <div class="phu">Đã tiêu <b>16.180.000đ</b> trên <b>18.545.000đ</b><br>Còn <b>11 ngày</b> · khoảng <b>215.000đ</b> mỗi ngày</div>
+        <div class="vach">
+          <i style="width:87%"></i>
+        </div>
+
+        <div class="treo">
+          <div class="day"></div>
+          <div class="the-row">
+            <div class="the chon"><div class="ten">Ăn uống</div><div class="gia">5.240.000đ</div></div>
+            <div class="the"><div class="ten">Nhà cửa</div><div class="gia">5.500.000đ</div></div>
+            <div class="the"><div class="ten">Đi lại</div><div class="gia">1.860.000đ</div></div>
+            <div class="the"><div class="ten">Cafe</div><div class="gia">890.000đ</div></div>
+          </div>
+        </div>
+
+        <!-- Vài khoản gần nhất, ngay trên bàn phím: ghi xong thấy nó rơi vào đây -->
+        <div class="vua-ghi">
+          <div class="vg-nhan">Vừa ghi hôm nay</div>
+          <div class="vg"><span class="cham" style="background:#3ED6B5"></span><span class="t">Cafe Highlands</span><span class="d"></span><span class="s">65.000đ</span></div>
+          <div class="vg"><span class="cham" style="background:#EDC948"></span><span class="t">Lương tháng 9</span><span class="d"></span><span class="s thu">+22.000.000đ</span></div>
+          <div class="vg"><span class="cham" style="background:#FF7A9C"></span><span class="t">Grab về nhà</span><span class="d"></span><span class="s">78.000đ</span></div>
+        </div>
+      </div>
+
+      <div class="pad">
+        <div class="nhap">45<span class="caret"></span></div>
+        <div class="keys">
+          <div class="k">1</div><div class="k">2</div><div class="k">3</div><div class="k u">k</div>
+          <div class="k">4</div><div class="k">5</div><div class="k">6</div><div class="k u">tr</div>
+          <div class="k">7</div><div class="k">8</div><div class="k">9</div><div class="k x">⌫</div>
+          <div class="k">.</div><div class="k">0</div><div class="k">000</div><div class="k u" style="font-size:16px">THU</div>
+        </div>
+        <div class="ghi">Ghi 45.000đ · Ăn uống</div>
+      </div>
+    </div>
+
+    <!-- ================= DESKTOP ================= -->
+    <div class="desk men">
+      <div class="dleft">
+        <div class="brand"><span class="mark"></span> Ví Riêng</div>
+
+        <div class="thang">Còn tiêu được tháng 9</div>
+        <div class="sotien">2.365.000<span class="dv">đ</span></div>
+        <div class="phu">Đã tiêu <b>16.180.000đ</b> trên <b>18.545.000đ</b><br>Còn <b>11 ngày</b> · khoảng <b>215.000đ</b> mỗi ngày</div>
+        <div class="vach"><i style="width:87%"></i></div>
+
+        <div class="treo">
+          <div class="day"></div>
+          <div class="the-row">
+            <div class="the chon"><div class="ten">Ăn uống</div><div class="gia">5.240.000đ</div></div>
+            <div class="the"><div class="ten">Nhà cửa</div><div class="gia">5.500.000đ</div></div>
+            <div class="the"><div class="ten">Đi lại</div><div class="gia">1.860.000đ</div></div>
+          </div>
+        </div>
+
+        <div class="dkeys">
+          <div class="dnhap">45<span class="caret"></span></div>
+          <div class="keys">
+            <div class="k">1</div><div class="k">2</div><div class="k">3</div><div class="k u">k</div>
+            <div class="k">4</div><div class="k">5</div><div class="k">6</div><div class="k u">tr</div>
+            <div class="k">7</div><div class="k">8</div><div class="k">9</div><div class="k x">⌫</div>
+            <div class="k">.</div><div class="k">0</div><div class="k">000</div><div class="k u" style="font-size:15px">THU</div>
+          </div>
+          <div class="ghi">Ghi 45.000đ · Ăn uống</div>
+        </div>
+      </div>
+
+      <div class="dright">
+        <div class="dhead">
+          <div class="t">Tháng 9, 2026</div>
+          <div class="mono" style="font-size:11px;color:#C2DCCE;letter-spacing:.1em">32 KHOẢN</div>
+        </div>
+        <div class="dnav">
+          <a class="on" href="#">Ghi &amp; xem</a>
+          <a href="#">Giao dịch</a>
+          <a href="#">Ngân sách</a>
+          <a href="#">Danh mục</a>
+          <a href="#">Báo cáo</a>
+        </div>
+        <div class="dsep"></div>
+
+        <div class="ngay">
+          <div class="nh">Hôm nay · 3/9</div>
+          <div class="dong"><span class="cham" style="background:#3ED6B5"></span><span class="ten">Cafe Highlands</span><span class="dot"></span><span class="dm">Cafe · 09:12</span><span class="so">65.000đ</span></div>
+          <div class="dong"><span class="cham" style="background:#EDC948"></span><span class="ten">Lương tháng 9</span><span class="dot"></span><span class="dm">Lương · 08:00</span><span class="so thu">+22.000.000đ</span></div>
+        </div>
+
+        <div class="ngay">
+          <div class="nh">Hôm qua · 2/9</div>
+          <div class="dong"><span class="cham" style="background:#FF7A9C"></span><span class="ten">Grab về nhà</span><span class="dot"></span><span class="dm">Đi lại · 22:40</span><span class="so">78.000đ</span></div>
+          <div class="dong"><span class="cham" style="background:#3ED6B5"></span><span class="ten">Đi chợ nấu ăn cuối tuần</span><span class="dot"></span><span class="dm">Ăn uống · 17:05</span><span class="so">412.000đ</span></div>
+          <div class="dong"><span class="cham" style="background:#B9AC96"></span><span class="ten">Netflix</span><span class="dot"></span><span class="dm">Khác · 07:00</span><span class="so">260.000đ</span></div>
+        </div>
+
+        <div class="ngay">
+          <div class="nh">Thứ Ba · 1/9</div>
+          <div class="dong"><span class="cham" style="background:#F5AC3C"></span><span class="ten">Tiền nhà tháng 9</span><span class="dot"></span><span class="dm">Nhà cửa · 10:00</span><span class="so">5.500.000đ</span></div>
+          <div class="dong"><span class="cham" style="background:#B9AC96"></span><span class="ten">Freelance sửa landing</span><span class="dot"></span><span class="dm">Khác · 08:30</span><span class="so thu">+2.500.000đ</span></div>
+        </div>
+
+        <div class="tong">
+          <span class="l">Chi tháng 9</span><span class="dot"></span><span class="so">16.180.000đ</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <b>Điều gì khác hẳn bản hiện tại</b>
+    <ul>
+      <li>Mở app là gõ được ngay — bàn phím số chiếm nửa dưới, không còn sheet chặn trước.</li>
+      <li>Con số dẫn đầu là <b>còn tiêu được</b>, không phải "tổng số dư" (số đó vốn không có thật vì chưa có số dư đầu kỳ).</li>
+      <li>Không còn thẻ kính bo góc nào — mặt bảng men liền một khối, cấu trúc đọc bằng khoảng hở và vệt sơn.</li>
+      <li>Nguồn tiền (Techcombank / Tiền mặt / Momo) đã gỡ bỏ khỏi mọi màn.</li>
+      <li>Danh mục là thẻ giá treo dây kẽm; thẻ đang chọn tràn màu vàng nghệ vào cả nút ghi.</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

@@ -101,7 +101,6 @@ export async function seedUser(userId: string, worker?: string) {
       type: t.type,
       amount_vnd: t.amountVnd,
       category_id: t.categoryId,
-      account_id: t.accountId,
       note: t.note ?? null,
       occurred_at: t.occurredAt,
       created_at: t.createdAt,

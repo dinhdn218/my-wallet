@@ -29,13 +29,11 @@ import {
   useExpenseStore,
   useTransaction,
 } from '@/store/useExpenseStore'
-import { ACCOUNTS } from '@/types/transaction'
-import type { AccountId } from '@/types/transaction'
 
-const modalGlass = 'border-glass-border bg-glass backdrop-blur-[28px]'
-const readCard = 'rounded-[18px] border border-glass-border bg-well p-3 px-4'
+const modalGlass = 'men-mat border-0'
+const readCard = 'bg-men-sau p-3 px-4'
 const fieldBox =
-  'h-[52px] w-full rounded-[15px] border border-glass-border bg-well px-3.5 text-[14.5px] font-bold outline-none'
+  'h-[52px] w-full bg-men-sau px-3.5 text-[15px] outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset'
 
 /** ISO -> giá trị cho <input type="datetime-local"> theo giờ địa phương. */
 function toLocalInput(iso: string) {
@@ -66,7 +64,7 @@ export function TransactionEdit({
     return (
       <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
         <DialogContent
-          className={cn(modalGlass, 'w-[480px] gap-4 rounded-[26px] p-[22px] sm:max-w-[480px]')}
+          className={cn(modalGlass, 'w-[480px] gap-4 p-6 sm:max-w-[480px]')}
           showCloseButton={false}
         >
           {body}
@@ -81,10 +79,10 @@ export function TransactionEdit({
         side="bottom"
         className={cn(
           modalGlass,
-          'no-scrollbar max-h-[94dvh] gap-4 overflow-y-auto rounded-t-[32px] px-[18px] pt-3 pb-[22px]',
+          'no-scrollbar max-h-[94dvh] gap-4 overflow-y-auto px-[18px] pt-3 pb-[22px]',
         )}
       >
-        <div className="mx-auto h-1 w-10 shrink-0 rounded-full bg-foreground/25" aria-hidden />
+        <div className="mx-auto h-1 w-10 shrink-0 bg-foreground/30" aria-hidden />
         {body}
       </SheetContent>
     </Sheet>
@@ -114,7 +112,6 @@ function EditBody({
   const [note, setNote] = useState('')
   const [occurredAt, setOccurredAt] = useState('')
   const [categoryId, setCategoryId] = useState('')
-  const [accountId, setAccountId] = useState<AccountId>('cash')
 
   // Nạp lại nháp khi mở một giao dịch khác. Không dùng effect: chỉ cần
   // phát hiện id đổi ngay trong lúc render.
@@ -124,7 +121,6 @@ function EditBody({
     setNote(transaction.note ?? '')
     setOccurredAt(toLocalInput(transaction.occurredAt))
     setCategoryId(transaction.categoryId)
-    setAccountId(transaction.accountId)
     setEditingAmount(false)
     setConfirmingDelete(false)
     setStatus('idle')
@@ -146,7 +142,6 @@ function EditBody({
       await updateTransaction(transaction.id, {
         amountVnd: parsedAmount,
         categoryId,
-        accountId,
         note: note.trim() || undefined,
         occurredAt: new Date(occurredAt).toISOString(),
       })
@@ -180,7 +175,7 @@ function EditBody({
         <button
           type="button"
           onClick={onClose}
-          className="text-[15px] font-bold text-muted transition-colors duration-[120ms] hover:text-foreground"
+          className="text-[15px] font-medium text-muted transition-colors duration-[120ms] hover:text-foreground"
         >
           Huỷ
         </button>
@@ -190,7 +185,7 @@ function EditBody({
           onClick={save}
           disabled={!canSave}
           className={cn(
-            'text-[15px] font-extrabold text-accent transition-colors duration-[120ms]',
+            'text-[15px] font-semibold text-accent transition-colors duration-[120ms]',
             !canSave && 'opacity-40',
           )}
         >
@@ -208,17 +203,17 @@ function EditBody({
       ) : (
         <div className={cn(readCard, 'flex items-center justify-between gap-3')}>
           <div className="flex min-w-0 flex-col gap-1">
-            <span className="font-mono text-[10.5px] font-bold tracking-[.16em] text-muted uppercase">
+            <span className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
               Số tiền
             </span>
-            <span className="text-[34px] leading-none font-extrabold tabular-nums">
+            <span className="text-[38px] leading-none font-semibold tabular-nums">
               {formatVnd(parsedAmount ?? transaction.amountVnd)}
             </span>
           </div>
           <button
             type="button"
             onClick={() => setEditingAmount(true)}
-            className="shrink-0 text-[12.5px] font-extrabold text-accent"
+            className="shrink-0 text-[15px] font-semibold text-accent"
           >
             Sửa
           </button>
@@ -234,10 +229,10 @@ function EditBody({
         />
       )}
 
-      {/* Danh mục + nguồn tiền */}
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* Danh mục — nguồn tiền đã gỡ bỏ, xem types/transaction.ts */}
+      <div>
         <div className={cn(readCard, 'flex flex-col gap-1.5')}>
-          <span className="font-mono text-[10.5px] font-bold tracking-[.16em] text-muted uppercase">
+          <span className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
             Danh mục
           </span>
           <Select
@@ -247,11 +242,11 @@ function EditBody({
           >
             <SelectTrigger
               size="none"
-              className="w-full border-0 bg-transparent p-0 text-[14.5px] font-bold"
+              className="w-full border-0 bg-transparent p-0 text-[15px] font-medium"
             >
               <span className="flex min-w-0 items-center gap-2">
                 <span
-                  className="size-2.5 shrink-0 rounded-[3px]"
+                  className="size-2.5 shrink-0"
                   style={{ background: lookup(categoryId).color }}
                   aria-hidden
                 />
@@ -268,30 +263,6 @@ function EditBody({
           </Select>
         </div>
 
-        <div className={cn(readCard, 'flex flex-col gap-1.5')}>
-          <span className="font-mono text-[10.5px] font-bold tracking-[.16em] text-muted uppercase">
-            Nguồn tiền
-          </span>
-          <Select
-            items={Object.fromEntries(ACCOUNTS.map((a) => [a.id, a.label]))}
-            value={accountId}
-            onValueChange={(v) => setAccountId((v ?? 'cash') as AccountId)}
-          >
-            <SelectTrigger
-              size="none"
-              className="w-full border-0 bg-transparent p-0 text-[14.5px] font-bold"
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {ACCOUNTS.map((a) => (
-                <SelectItem key={a.id} value={a.id}>
-                  {a.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
       </div>
 
       <input
@@ -310,7 +281,7 @@ function EditBody({
         className={fieldBox}
       />
 
-      <p className="text-[12.5px] font-medium text-muted">
+      <p className="font-mono text-[11px] text-muted">
         {formatStamp(transaction.createdAt)}
       </p>
 
@@ -318,13 +289,13 @@ function EditBody({
 
       {/* Xoá — cuối vùng cuộn, không nằm trong vùng neo đáy */}
       {confirmingDelete ? (
-        <div className="rounded-[18px] border border-negative/40 bg-negative/12 p-3.5">
-          <p className="text-[17px] font-extrabold text-pretty">
+        <div className="border-2 border-negative bg-negative/12 p-4">
+          <p className="text-[19px] font-semibold text-pretty">
             Xoá “{transaction.note ?? lookup(transaction.categoryId).label}”?
           </p>
-          <p className="mt-1.5 text-[13px] font-medium text-muted text-pretty">
-            {formatVnd(transaction.amountVnd)} sẽ bị gỡ khỏi số dư và mọi báo cáo.{' '}
-            <span className="font-bold text-foreground">Không hoàn tác được.</span>
+          <p className="mt-1.5 text-[15px] text-muted text-pretty">
+            {formatVnd(transaction.amountVnd)} sẽ bị gỡ khỏi mọi con số và báo cáo.{' '}
+            <span className="font-semibold text-foreground">Không hoàn tác được.</span>
           </p>
           <div className="mt-3 flex gap-2.5">
             <motion.button
@@ -332,14 +303,14 @@ function EditBody({
               whileTap={{ scale: 0.98 }}
               onClick={remove}
               disabled={saving}
-              className="h-[52px] flex-1 rounded-[15px] bg-negative text-[15px] font-extrabold text-negative-foreground transition-[filter] duration-[120ms] hover:brightness-[1.06] active:brightness-90 disabled:opacity-60"
+              className="h-[52px] flex-1 bg-negative text-[15px] font-semibold text-negative-foreground transition-[filter] duration-[120ms] hover:brightness-[1.06] active:brightness-90 disabled:opacity-60"
             >
               {saving ? 'Đang xoá…' : 'Xoá'}
             </motion.button>
             <button
               type="button"
               onClick={() => setConfirmingDelete(false)}
-              className="h-[52px] flex-1 rounded-[15px] border border-glass-border text-[15px] font-bold transition-colors duration-[120ms] hover:bg-foreground/5"
+              className="h-[52px] flex-1 bg-men-phim text-[15px] font-medium transition-colors duration-[120ms] hover:brightness-110"
             >
               Giữ lại
             </button>
@@ -349,7 +320,7 @@ function EditBody({
         <button
           type="button"
           onClick={() => setConfirmingDelete(true)}
-          className="h-[52px] w-full rounded-[15px] border border-negative/50 text-[15px] font-bold text-negative transition-colors duration-[120ms] hover:bg-negative/10"
+          className="h-[52px] w-full border-2 border-negative text-[15px] font-medium text-negative transition-colors duration-[120ms] hover:bg-negative/12"
         >
           Xoá giao dịch
         </button>
@@ -363,18 +334,18 @@ function DialogOrSheetTitle({ wide }: { wide: boolean }) {
   if (wide) {
     return (
       <>
-        <DialogTitle className="text-[17px] font-extrabold">Sửa giao dịch</DialogTitle>
+        <DialogTitle className="text-[16px] font-semibold">Sửa giao dịch</DialogTitle>
         <DialogDescription className="sr-only">
-          Sửa số tiền, danh mục, nguồn tiền, tên và thời điểm của giao dịch.
+          Sửa số tiền, danh mục, tên và thời điểm của giao dịch.
         </DialogDescription>
       </>
     )
   }
   return (
     <>
-      <SheetTitle className="text-[17px] font-extrabold">Sửa giao dịch</SheetTitle>
+      <SheetTitle className="text-[16px] font-semibold">Sửa giao dịch</SheetTitle>
       <SheetDescription className="sr-only">
-        Sửa số tiền, danh mục, nguồn tiền, tên và thời điểm của giao dịch.
+        Sửa số tiền, danh mục, tên và thời điểm của giao dịch.
       </SheetDescription>
     </>
   )

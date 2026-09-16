@@ -1,53 +1,62 @@
 import { cn } from '@/lib/utils'
 
-const TRACK = 'color-mix(in oklab, var(--foreground) 12%, transparent)'
-
 /**
- * Vòng tiến độ ngân sách. Dùng conic-gradient chứ không phải chart:
- * đây là một con số duy nhất, không phải chuỗi dữ liệu.
+ * Chỉ báo hạn mức — vốn là vòng tròn conic-gradient, nay là VẠCH SƠN.
+ *
+ * Đổi vì hai lý do: vòng tròn tiến độ là thứ mọi app tài chính đều vẽ (đúng
+ * cái rut mà thiết kế này từ chối), và một vòng bo tròn nằm lạc lõng trong
+ * thế giới không có góc bo nào. Giữ nguyên tên file + props để chỗ gọi không
+ * phải sửa.
+ *
+ * Vượt hạn mức đọc được bằng BA cách: màu đỏ son, chữ "vượt", và vạch đổi
+ * hướng lấp đầy — người mù màu vẫn nhận ra.
  */
 export function BudgetRing({
   percent,
   over,
   size,
-  hole,
   valueClassName = 'text-[26px]',
   className,
 }: {
   percent: number
   over?: boolean
+  /** Bề rộng vùng vạch; chiều cao suy ra từ nội dung. */
   size: number
-  hole: number
+  /** Giữ cho tương thích chỗ gọi cũ — không còn dùng. */
+  hole?: number
   valueClassName?: string
   className?: string
 }) {
   const capped = Math.min(100, Math.max(0, percent))
-  const color = over ? 'var(--negative)' : 'var(--accent)'
 
   return (
     <div
-      className={cn('relative shrink-0 rounded-full', className)}
-      style={{
-        width: size,
-        height: size,
-        background: `conic-gradient(${color} 0 ${capped}%, ${TRACK} ${capped}% 100%)`,
-      }}
+      className={cn('flex shrink-0 flex-col gap-1.5', className)}
+      style={{ width: size }}
       role="img"
-      aria-label={`Đã dùng ${percent}% hạn mức tháng`}
+      aria-label={`Đã dùng ${percent}% hạn mức tháng${over ? ', đã vượt' : ''}`}
     >
-      <div
-        className="absolute rounded-full bg-background"
-        style={{ inset: (size - hole) / 2 }}
-        aria-hidden
-      />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
-        <span className={cn('font-extrabold tabular-nums', valueClassName)}>
-          {percent}%
-        </span>
-        <span className="font-mono text-[10.5px] font-bold tracking-[.16em] text-muted uppercase">
-          Đã dùng
-        </span>
+      <span
+        className={cn(
+          'font-semibold tabular-nums',
+          over && 'text-negative',
+          valueClassName,
+        )}
+      >
+        {percent}%
+      </span>
+      <div className="flex h-[10px] w-full bg-men-sau" aria-hidden>
+        <div
+          className={cn(
+            'h-full transition-[width] duration-500',
+            over ? 'bg-negative' : 'bg-foreground',
+          )}
+          style={{ width: `${capped}%` }}
+        />
       </div>
+      <span className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
+        {over ? 'Đã vượt' : 'Đã dùng'}
+      </span>
     </div>
   )
 }

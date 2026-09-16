@@ -5,7 +5,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { id: 'tong-quan', label: 'Tổng quan', href: '/' },
+  { id: 'ghi-xem', label: 'Ghi & xem', href: '/' },
   { id: 'giao-dich', label: 'Giao dịch', href: '/giao-dich' },
   { id: 'danh-muc', label: 'Danh mục', href: '/danh-muc' },
   { id: 'ngan-sach', label: 'Ngân sách', href: '/ngan-sach' },

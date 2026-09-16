@@ -54,10 +54,10 @@ export function Numpad({ value, onChange, onSubmit, canSubmit }: NumpadProps) {
           whileTap={{ scale: 0.98 }}
           onClick={() => append(key)}
           className={cn(
-            'h-[56px] rounded-[14px] border transition-colors duration-[120ms]',
+            'h-[56px] bg-men-phim transition-[filter] duration-[120ms] hover:brightness-110',
             key.kind === UNIT
-              ? 'border-accent/50 bg-accent/16 text-[19px] font-extrabold text-accent'
-              : 'border-glass-border bg-well text-[22px] font-bold',
+              ? 'text-[19px] font-semibold text-accent'
+              : 'text-[26px] font-medium',
           )}
         >
           {key.label}
@@ -68,7 +68,7 @@ export function Numpad({ value, onChange, onSubmit, canSubmit }: NumpadProps) {
         type="button"
         whileTap={{ scale: 0.98 }}
         onClick={() => onChange(value + '0')}
-        className="h-[52px] rounded-[14px] border border-glass-border bg-well text-[22px] font-bold transition-colors duration-[120ms]"
+        className="h-[52px] bg-men-phim text-[26px] font-medium transition-[filter] duration-[120ms] hover:brightness-110"
       >
         0
       </motion.button>
@@ -76,7 +76,7 @@ export function Numpad({ value, onChange, onSubmit, canSubmit }: NumpadProps) {
         type="button"
         whileTap={{ scale: 0.98 }}
         onClick={() => onChange(value + '000')}
-        className="h-[52px] rounded-[14px] border border-glass-border bg-well text-[22px] font-bold transition-colors duration-[120ms]"
+        className="h-[52px] bg-men-phim text-[26px] font-medium transition-[filter] duration-[120ms] hover:brightness-110"
       >
         000
       </motion.button>
@@ -84,7 +84,7 @@ export function Numpad({ value, onChange, onSubmit, canSubmit }: NumpadProps) {
         type="button"
         whileTap={{ scale: 0.98 }}
         onClick={() => onChange(value.slice(0, -1))}
-        className="h-[52px] rounded-[14px] border border-glass-border bg-well text-[15px] font-bold transition-colors duration-[120ms]"
+        className="h-[52px] bg-men-phim text-[15px] font-medium transition-[filter] duration-[120ms] hover:brightness-110"
       >
         Xoá
       </motion.button>
@@ -94,7 +94,7 @@ export function Numpad({ value, onChange, onSubmit, canSubmit }: NumpadProps) {
         onClick={onSubmit}
         disabled={!canSubmit}
         className={cn(
-          'h-[52px] rounded-[14px] bg-accent text-[15px] font-extrabold text-accent-foreground',
+          'h-[52px] bg-accent text-[15px] font-semibold text-accent-foreground',
           'transition-colors duration-[120ms] hover:brightness-[1.06] active:brightness-90',
           !canSubmit && 'opacity-40',
         )}

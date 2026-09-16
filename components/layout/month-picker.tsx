@@ -6,7 +6,6 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@/components/ui/select'
-import { glass } from '@/components/ui/glass-card'
 import { formatMonthLabel, formatMonthShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useAvailableMonths, useExpenseStore } from '@/store/useExpenseStore'
@@ -42,11 +41,10 @@ export function MonthPicker({
         aria-label="Chọn tháng"
         size="none"
         className={cn(
-          glass,
-          'shrink-0 justify-center gap-1.5 font-bold text-foreground',
+          'shrink-0 justify-center gap-1.5 bg-men-dam font-medium text-foreground',
           isMobile
-            ? 'h-[44px] rounded-[13px] px-[13px] text-[13.5px]'
-            : 'h-10 rounded-[13px] px-[15px] text-[13.5px] xl:h-[42px]',
+            ? 'h-[40px] px-3 text-[15px]'
+            : 'h-9 px-3.5 text-[15px]',
           '[&>svg]:size-3 [&>svg]:text-muted',
           className,
         )}
@@ -54,12 +52,12 @@ export function MonthPicker({
         {isMobile ? formatMonthShort(activeMonth) : formatMonthLabel(activeMonth)}
       </SelectTrigger>
 
-      <SelectContent className="border border-glass-border bg-glass backdrop-blur-[28px]">
+      <SelectContent className="border-0 bg-men-dam">
         {months.map((m) => (
           <SelectItem
             key={m}
             value={m}
-            className="py-2 pl-2.5 text-[13.5px] font-bold"
+            className="py-2 pl-2.5 text-[15px] font-medium"
           >
             {formatMonthLabel(m)}
           </SelectItem>

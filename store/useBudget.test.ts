@@ -21,7 +21,6 @@ const base: Omit<Transaction, 'id'> = {
   type: 'expense',
   amountVnd: 100_000,
   categoryId: 'an-uong',
-  accountId: 'cash',
   occurredAt: '2026-09-10T09:00:00.000Z',
   createdAt: '2026-09-10T09:00:00.000Z',
 }

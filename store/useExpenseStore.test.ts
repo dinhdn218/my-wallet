@@ -10,8 +10,7 @@ vi.mock('@/lib/supabase/queries', async () => {
 
 import {
   computeAvailableMonths,
-  computeBalanceByAccount,
-  computeCashflowSeries,
+    computeCashflowSeries,
   computeExpenseByCategory,
   computeMonthlySummary,
   computeRecentTransactions,
@@ -23,7 +22,6 @@ const base: Omit<Transaction, 'id'> = {
   type: 'expense',
   amountVnd: 100_000,
   categoryId: 'an-uong',
-  accountId: 'cash',
   occurredAt: '2026-09-01T09:00:00.000Z',
   createdAt: '2026-09-01T09:00:00.000Z',
 }
@@ -43,7 +41,6 @@ describe('addTransaction', () => {
       type: 'expense',
       amountVnd: 412_000,
       categoryId: 'an-uong',
-      accountId: 'cash',
       note: 'Đi chợ',
       occurredAt: '2026-09-02T10:00:00.000Z',
     })
@@ -60,7 +57,6 @@ describe('addTransaction', () => {
       type: 'expense',
       amountVnd: 65_000,
       categoryId: 'cafe',
-      accountId: 'cash',
       occurredAt: '2026-09-02T10:00:00.000Z',
     })
     expect(useExpenseStore.getState().transactions[0].amountVnd).toBeGreaterThan(0)
@@ -122,19 +118,6 @@ describe('computeMonthlySummary', () => {
       net: 0,
       savingRate: 0,
     })
-  })
-})
-
-describe('computeBalanceByAccount', () => {
-  it('cộng thu, trừ chi theo từng nguồn tiền', () => {
-    const acc = computeBalanceByAccount([
-      tx({ id: '1', type: 'income', amountVnd: 40_000_000, accountId: 'techcombank' }),
-      tx({ id: '2', type: 'expense', amountVnd: 800_000, accountId: 'techcombank' }),
-      tx({ id: '3', type: 'income', amountVnd: 3_150_000, accountId: 'cash' }),
-    ])
-    expect(acc.techcombank).toBe(39_200_000)
-    expect(acc.cash).toBe(3_150_000)
-    expect(acc.momo).toBe(0)
   })
 })
 

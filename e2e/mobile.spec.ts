@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 test('thanh tab dưới có 4 mục, không có Danh mục', async ({ page }) => {
   await page.goto('/')
 
-  for (const name of ['Tổng quan', 'Giao dịch', 'Ngân sách', 'Báo cáo']) {
+  for (const name of ['Ghi & xem', 'Giao dịch', 'Ngân sách', 'Báo cáo']) {
     await expect(page.getByRole('link', { name, exact: true })).toBeVisible()
   }
   await expect(page.getByRole('link', { name: 'Danh mục', exact: true })).toHaveCount(0)
@@ -44,7 +44,7 @@ test('pill chọn tháng ở header mobile đổi được tháng', async ({ pag
 test('bấm một dòng ở danh sách giao dịch mở được form sửa', async ({ page }) => {
   await page.goto('/giao-dich')
 
-  await page.getByTestId(`tx-row-m-${SEED_IDS.cafeHighlands}`).click()
+  await page.getByTestId(`tx-row-${SEED_IDS.cafeHighlands}`).click()
 
   await expect(page.getByLabel('Tên giao dịch')).toBeVisible()
 })

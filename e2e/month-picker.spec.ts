@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
   await resetStore(page)
 })
 
-test('đổi tháng trên Tổng quan đổi số liệu của tháng đó', async ({ page }) => {
+test('đổi tháng trên màn ghi đổi số liệu của tháng đó', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('combobox', { name: 'Chọn tháng' })).toContainText(
     'Tháng 9, 2026',

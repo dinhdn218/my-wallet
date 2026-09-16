@@ -1,51 +1,47 @@
 'use client'
 
 import { MonthPicker } from '@/components/layout/month-picker'
-import { TransactionSheet } from '@/components/transaction/transaction-sheet'
 import { cn } from '@/lib/utils'
 
-/** Đầu trang dùng chung cho các màn 2a–2d. */
+/**
+ * Đầu trang dùng chung cho 4 màn phụ.
+ *
+ * Không còn nút "+ Thêm giao dịch": việc ghi đã có chỗ cố định ở màn chính và
+ * thanh tab dưới (mobile), nên nhân bản nó lên mọi đầu trang chỉ làm loãng.
+ */
 export function PageHeader({
   title,
   meta,
   showMonthPill = true,
-  showAddButton = true,
   children,
 }: {
   title: string
   meta?: React.ReactNode
   showMonthPill?: boolean
-  showAddButton?: boolean
   children?: React.ReactNode
 }) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-4">
-      <div className="flex min-w-0 flex-col gap-1">
-        <h1 className="text-[22px] leading-none font-extrabold tracking-[-.015em] md:text-[23px] xl:text-[26px]">
+    <header className="flex flex-wrap items-baseline justify-between gap-4">
+      <div className="flex min-w-0 flex-col gap-1.5">
+        <h1 className="text-[26px] leading-none font-semibold tracking-[-.01em] md:text-[27px]">
           {title}
         </h1>
         {meta ? (
-          <p className="text-[12px] font-medium text-muted md:text-[12.5px] xl:text-[13px]">
+          <p className="font-mono text-[11px] tracking-[.06em] text-muted">
             {meta}
           </p>
         ) : null}
       </div>
 
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2">
         {children}
         {showMonthPill && <MonthPicker className="hidden sm:flex" />}
-        {showAddButton && (
-          <TransactionSheet
-            label="+ Thêm giao dịch"
-            triggerClassName="hidden md:flex"
-          />
-        )}
       </div>
     </header>
   )
 }
 
-/** Chip lọc / chọn dùng ở 2a và 2d. */
+/** Chip lọc — thẻ giá nhỏ, vuông góc như mọi thứ trong thế giới này. */
 export function FilterChip({
   active,
   onClick,
@@ -63,11 +59,10 @@ export function FilterChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        'flex h-[44px] shrink-0 items-center gap-2 rounded-xl px-3.5 text-[13px] whitespace-nowrap',
-        'transition-colors duration-[120ms] active:bg-accent/8 md:h-[38px]',
+        'flex h-9 shrink-0 items-center gap-2 px-3.5 text-[15px] transition-colors duration-[120ms]',
         active
-          ? 'border-2 border-accent bg-accent/14 font-extrabold'
-          : 'border border-glass-border font-bold text-foreground/70 hover:bg-foreground/5 hover:text-foreground',
+          ? 'bg-accent font-semibold text-accent-foreground'
+          : 'bg-men-dam font-normal text-muted hover:text-foreground',
         className,
       )}
     >

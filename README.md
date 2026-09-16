@@ -4,6 +4,10 @@ App web ghi thu chi cá nhân bằng tiếng Việt, đơn vị VND. Dữ liệu
 **Supabase (Postgres)**, đăng nhập bằng **magic link qua email** — đổi máy chỉ
 cần đăng nhập lại.
 
+Giao diện là **"Bảng Giá Quán"**: tấm bảng men sơn tay, một cột số lớn, các
+dòng giá nối bằng đường chấm. Việc chính là GHI — mở app là bàn phím số đã sẵn
+sàng, không qua lớp sheet nào.
+
 ## Chạy
 
 ```bash
@@ -33,7 +37,7 @@ Next 16 chỉ cho một `next dev` mỗi thư mục.
 | Route | Màn |
 |---|---|
 | `/dang-nhap` | Đăng nhập bằng magic link |
-| `/` | Tổng quan — số dư, thu & chi, donut theo danh mục, giao dịch gần đây |
+| `/` | Ghi & xem — bàn phím số luôn sẵn, con số "còn tiêu được", bảng giá theo ngày |
 | `/giao-dich` | Danh sách + lọc theo loại/danh mục, sắp xếp, sửa & xoá |
 | `/ngan-sach` | Hạn mức chi theo danh mục, đặt/sửa/gỡ |
 | `/danh-muc` | Đổi tên và màu danh mục, xoá danh mục chưa dùng |
@@ -50,15 +54,39 @@ proxy.ts      làm mới session + chặn route (Next 16 đổi tên từ middle
 supabase/     schema.sql + hướng dẫn dựng project
 lib/supabase/ client, mapper snake_case↔camelCase, các câu truy vấn
 components/
-  dashboard/  4 thẻ của màn Tổng quan
-  layout/     sidebar · topbar · header + tabbar mobile · bộ chọn tháng
-  transaction/form thêm và sửa giao dịch
-  budget/     dòng hạn mức + vòng tròn tiến độ
-  ui/         primitive shadcn + lớp kính dùng chung
+  dashboard/  con số "còn tiêu được" + trạng thái rỗng
+  layout/     cột trái · header + tabbar mobile · bộ chọn tháng
+  transaction/ghi nhanh (bàn phím số) · dòng giá · sửa giao dịch
+  budget/     dòng hạn mức + vạch sơn tiến độ
+  ui/         primitive shadcn + thẻ giá treo dây kẽm
 lib/          format tiền/ngày, danh mục, theme, tiện ích
 store/        một store Zustand + các selector
 e2e/          spec Playwright
 ```
+
+## Thiết kế
+
+**Thế giới: bảng giá quán ăn sơn tay.** Nền men xanh rêu chiếm ~40% mọi màn,
+chữ sơn stencil (Oswald), nhãn đo đạc mono (Roboto Mono). Không có thẻ bo góc
+nào — `--radius: 0` và cấu trúc đọc bằng khoảng hở + vệt sơn. Hợp đồng thiết
+kế đầy đủ nằm ở `.impeccable/surfaces/app-app-page-tsx.md`.
+
+**Chế độ sáng vẫn là tấm bảng men, chỉ là ngoài nắng.** Men sáng lên, sơn
+thành mực xanh đậm. Đảo về nền be trung tính sẽ mất luôn thế giới.
+
+**Bảng giá không viết số âm.** Khoản chi là GIÁ (`65.000đ`), chỉ khoản thu mới
+có dấu `+`. Dấu vẫn suy ra từ `type` như cũ, chỉ là cách hiển thị đổi.
+
+**Việc ghi chiếm chỗ tốt nhất của màn hình.** Desktop: cột trái 360–400px giữ
+con số + bàn phím. Mobile: bàn phím neo đáy (`max-h-[62dvh]`), danh sách cuộn
+phía trên. Đây là lý do màn chính KHÔNG dùng `CotTrai` như 4 màn phụ.
+
+**"Còn tiêu được" thay cho "Tổng số dư".** Số dư cũ gây hiểu lầm vì không có
+số dư đầu kỳ. Khi chưa đặt hạn mức nào, `useConTieuDuoc` trả `coHanMuc: false`
+và màn hiện "đã tiêu tháng này" — KHÔNG bịa ra một con số còn lại bằng 0.
+
+**Nguồn tiền đã gỡ bỏ** khỏi type, store, form, schema. Xem
+`supabase/migrations/001-drop-account-id.sql`.
 
 ## Vài quyết định đáng nhớ
 
@@ -143,10 +171,10 @@ mỗi chuỗi khớp hai lần.
 
 ## Còn tồn
 
-- Số dư tổng đang là tổng dẫn xuất từ giao dịch, chưa có khái niệm **số dư đầu
-  kỳ** theo từng nguồn tiền — nên không khớp con số trong mockup.
-- Thẻ số dư mới hiện 2 nguồn tiền đầu (`.slice(0, 2)`), trong khi `ACCOUNTS` có
-  3 — nguồn thứ ba không bao giờ lên thẻ.
-- Mini bar ở thẻ "Thu & chi" cao 32px thay vì 52px như thiết kế: hàng bento
-  208px không đủ chỗ cho nhãn + hai dòng số + biểu đồ 52px ở đúng cỡ chữ.
+- **Migration `001-drop-account-id.sql` CHƯA chạy.** Cột `account_id` vẫn
+  `not null` trong Postgres, nên app mới (không gửi cột đó) sẽ lỗi khi ghi giao
+  dịch cho tới khi migration được chạy. Xem file đó để biết thứ tự an toàn.
+- Bộ E2E đã cập nhật selector nhưng **chưa chạy lại được** vì lý do trên.
+- `playwright.config.ts` không tự nạp `.env.local`; phải `set -a && . ./.env.local`
+  trước khi chạy E2E.
 - `docs/superpowers/` là spec/plan của thiết kế **đầu tiên**, đã lỗi thời.

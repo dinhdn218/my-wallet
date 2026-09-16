@@ -32,14 +32,14 @@ test('mọi mục trên thanh nav desktop đều vào được', async ({ page }
     ['Danh mục', '/danh-muc'],
     ['Ngân sách', '/ngan-sach'],
     ['Báo cáo', '/bao-cao'],
-    ['Tổng quan', '/'],
+    ['Ghi & xem', '/'],
   ] as const) {
     await page.getByRole('link', { name, exact: true }).first().click()
     await expect(page).toHaveURL(new RegExp(`${path.replace('/', '\\/')}$`))
   }
 })
 
-test('không còn nút chết nào trên Tổng quan', async ({ page }) => {
+test('không còn nút chết nào trên màn ghi', async ({ page }) => {
   await page.goto('/')
   // Chờ hydrate xong để các thẻ vẽ đủ nội dung.
   await expect(page.getByText('Cafe Highlands').first()).toBeVisible()
@@ -53,15 +53,15 @@ test('không còn nút chết nào trên Tổng quan', async ({ page }) => {
   ).toHaveCount(0)
 })
 
-test('sửa được giao dịch ngay từ thẻ trên Tổng quan', async ({ page }) => {
+test('sửa được giao dịch ngay từ bảng giá', async ({ page }) => {
   await page.goto('/')
 
-  await page.getByTestId(`recent-row-${SEED_IDS.cafeHighlands}`).click()
+  await page.getByTestId(`tx-row-${SEED_IDS.cafeHighlands}`).click()
 
   const name = page.getByLabel('Tên giao dịch')
   await expect(name).toBeVisible()
-  await name.fill('Cafe sửa từ Tổng quan')
+  await name.fill('Cafe sửa từ màn ghi')
   await page.getByRole('button', { name: 'Lưu' }).click()
 
-  await expect(page.getByText('Cafe sửa từ Tổng quan')).toBeVisible()
+  await expect(page.getByText('Cafe sửa từ màn ghi')).toBeVisible()
 })

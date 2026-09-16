@@ -9,7 +9,7 @@ export function MobileHeader({ className }: { className?: string }) {
   return (
     <header
       className={cn(
-        'flex h-[54px] shrink-0 items-center justify-between gap-3 px-[18px] pt-2',
+        'flex h-[54px] shrink-0 items-center justify-between gap-3 bg-men-dam px-4',
         className,
       )}
     >

@@ -4,9 +4,9 @@ import { setTheme } from '@/lib/theme'
 import { cn } from '@/lib/utils'
 
 const SIZES = {
-  desktop: { box: 'h-[46px] w-full', seg: 'flex-1 text-[13px]' },
-  tablet: { box: 'h-10', seg: 'w-14 text-[12.5px]' },
-  mobile: { box: 'h-[44px]', seg: 'w-12 text-[12.5px]' },
+  desktop: { box: 'h-[46px] w-full', seg: 'flex-1 text-[15px]' },
+  tablet: { box: 'h-10', seg: 'w-14 text-[11px]' },
+  mobile: { box: 'h-[44px]', seg: 'w-12 text-[11px]' },
 } as const
 
 /**
@@ -27,7 +27,7 @@ export function ThemeToggle({
   return (
     <div
       className={cn(
-        'flex shrink-0 items-center gap-1 rounded-[14px] border border-glass-border bg-well p-1',
+        'flex shrink-0 items-center gap-px bg-men-sau p-px',
         s.box,
         className,
       )}
@@ -38,8 +38,8 @@ export function ThemeToggle({
         type="button"
         onClick={() => setTheme('light')}
         className={cn(
-          'h-full rounded-[10px] font-semibold text-muted transition-colors duration-[120ms]',
-          'light:bg-white light:font-extrabold light:text-foreground',
+          'h-full font-medium text-muted transition-colors duration-[120ms]',
+          'light:bg-accent light:font-semibold light:text-accent-foreground',
           s.seg,
         )}
       >
@@ -49,8 +49,8 @@ export function ThemeToggle({
         type="button"
         onClick={() => setTheme('dark')}
         className={cn(
-          'h-full rounded-[10px] font-semibold text-muted transition-colors duration-[120ms]',
-          'dark:bg-white/10 dark:font-extrabold dark:text-foreground',
+          'h-full font-medium text-muted transition-colors duration-[120ms]',
+          'dark:bg-accent dark:font-semibold dark:text-accent-foreground',
           s.seg,
         )}
       >

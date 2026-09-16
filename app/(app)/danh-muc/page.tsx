@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { CotTrai } from '@/components/layout/cot-trai'
 import { PageHeader } from '@/components/layout/page-header'
-import { AmountSkeleton, GlassCard } from '@/components/ui/glass-card'
+import { AmountSkeleton } from '@/components/ui/glass-card'
 import { CHART_COLORS } from '@/lib/categories'
 import { formatVnd } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -22,23 +23,27 @@ export default function CategoriesPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
 
   return (
-    <main className="no-scrollbar flex min-h-0 min-w-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pt-3 md:gap-4 md:p-5 xl:gap-4 xl:p-6 xl:px-[26px]">
+    <div className="flex min-h-0 flex-1 md:flex-row">
+      <CotTrai />
+
+      <main className="no-scrollbar flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-4 pt-4 pb-4 md:px-8 md:pt-8 md:pb-8">
       <PageHeader
         title="Danh mục"
         meta={`${categories.length} danh mục · chỉ xoá được danh mục chưa có giao dịch`}
-        showAddButton={false}
       />
 
-      <GlassCard className="rounded-[20px] p-3.5 px-4 md:rounded-[22px] md:p-[18px] md:px-5 xl:p-5 xl:px-[22px]">
+      <div className="mt-5 h-px bg-men-vien" />
+
+      <div className="mt-2">
         {/* Header cột — desktop */}
-        <div className="hidden items-center gap-3.5 border-b border-line pb-2.5 md:flex">
-          <span className="flex-1 font-mono text-[10.5px] font-bold tracking-[.16em] text-muted uppercase">
+        <div className="hidden items-center gap-3.5 border-b border-men-vien pb-2.5 md:flex">
+          <span className="flex-1 font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
             Tên
           </span>
-          <span className="hidden w-30 font-mono text-[10.5px] font-bold tracking-[.16em] text-muted uppercase xl:block">
+          <span className="hidden w-30 font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase xl:block">
             Giao dịch
           </span>
-          <span className="w-[150px] text-right font-mono text-[10.5px] font-bold tracking-[.16em] text-muted uppercase">
+          <span className="w-[150px] text-right font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
             Chi tháng {monthNo}
           </span>
           <span className="w-24" aria-hidden />
@@ -84,8 +89,9 @@ export default function CategoriesPage() {
             })}
           </div>
         )}
-      </GlassCard>
-    </main>
+      </div>
+      </main>
+    </div>
   )
 }
 
@@ -121,25 +127,25 @@ function CategoryRow({
   return (
     <div
       data-testid={`cat-row-${id}`}
-      className="flex flex-col border-b border-line py-3.5 last:border-b-0"
+      className="flex flex-col border-b border-men-vien py-3.5 last:border-b-0"
     >
       <div className="flex items-center gap-3.5">
         <span className="flex min-w-0 flex-1 items-center gap-2.5">
           <span
-            className="size-[11px] shrink-0 rounded"
+            className="size-2.5 shrink-0"
             style={{ background: color }}
             aria-hidden
           />
-          <span className="min-w-0 text-[15px] font-bold text-pretty md:text-[16px]">
+          <span className="min-w-0 text-[16px] text-pretty">
             {label}
           </span>
         </span>
 
-        <span className="hidden w-30 text-[13px] font-semibold text-muted xl:block">
+        <span className="hidden w-30 font-mono text-[11px] text-muted xl:block">
           {count} giao dịch
         </span>
 
-        <span className="w-[110px] shrink-0 text-right text-[15px] font-extrabold tabular-nums md:w-[150px] md:text-[16px]">
+        <span className="w-[110px] shrink-0 text-right text-[16px] font-semibold tabular-nums md:w-[150px]">
           {formatVnd(spend)}
         </span>
 
@@ -147,7 +153,7 @@ function CategoryRow({
           <button
             type="button"
             onClick={onEdit}
-            className="text-[13px] font-bold text-accent"
+            className="text-[15px] font-semibold text-accent"
           >
             Sửa
           </button>
@@ -156,8 +162,8 @@ function CategoryRow({
             onClick={remove}
             disabled={!deletable || busy}
             className={cn(
-              'text-[13px] font-bold',
-              deletable ? 'text-negative' : 'cursor-not-allowed text-foreground/35',
+              'text-[15px] font-semibold',
+              deletable ? 'text-negative' : 'cursor-not-allowed text-foreground/40',
             )}
           >
             {busy ? 'Đang xoá…' : 'Xoá'}
@@ -166,14 +172,14 @@ function CategoryRow({
       </div>
 
       {failed && (
-        <p role="alert" className="mt-1.5 text-[12.5px] font-semibold text-negative">
+        <p role="alert" className="mt-1.5 text-[15px] font-medium text-negative">
           Chưa xoá được — không kết nối được máy chủ. Thử lại sau.
         </p>
       )}
 
       {/* Nói thẳng lý do ngay dưới, không ẩn nút. */}
       {!deletable && (
-        <p className="mt-1.5 text-[12.5px] font-medium text-muted text-pretty">
+        <p className="mt-1.5 text-[15px] text-muted text-pretty">
           Chưa xoá được — còn {count} giao dịch. Chuyển chúng sang danh mục khác trước
           rồi mới xoá được.
         </p>
@@ -216,8 +222,8 @@ function CategoryEditor({
   }
 
   return (
-    <div className="my-2 rounded-[18px] border-2 border-accent bg-accent/9 p-4">
-      <p className="font-mono text-[10.5px] font-bold tracking-[.16em] text-accent uppercase">
+    <div className="my-2 border-2 border-accent bg-accent/10 p-4">
+      <p className="font-mono text-[11px] font-medium tracking-[.2em] text-accent uppercase">
         Đang sửa danh mục
       </p>
 
@@ -230,7 +236,7 @@ function CategoryEditor({
           if (e.key === 'Escape') onDone()
         }}
         aria-label="Tên danh mục"
-        className="mt-3 h-[52px] w-full rounded-[14px] border-2 border-accent bg-well px-3.5 text-[17px] font-bold outline-none"
+        className="mt-3 h-[52px] w-full border-2 border-accent bg-men-sau px-3.5 text-[16px] font-medium outline-none"
       />
 
       {/* Chỉ chọn trong 6 màu biểu đồ — không có color picker tự do. */}
@@ -245,7 +251,7 @@ function CategoryEditor({
               aria-label={`Màu ${option}`}
               aria-pressed={selected}
               className={cn(
-                'size-[30px] rounded-[9px] transition-opacity duration-[120ms]',
+                'size-[30px] transition-opacity duration-[120ms]',
                 !selected && 'opacity-50 hover:opacity-80',
               )}
               style={{
@@ -260,7 +266,7 @@ function CategoryEditor({
       </div>
 
       {status === 'error' && (
-        <p role="alert" className="mt-3 text-[12.5px] font-semibold text-negative">
+        <p role="alert" className="mt-3 text-[15px] font-medium text-negative">
           Chưa lưu được — không kết nối được máy chủ. Thử lại sau.
         </p>
       )}
@@ -271,7 +277,7 @@ function CategoryEditor({
           onClick={save}
           disabled={!draftLabel.trim() || status === 'saving'}
           className={cn(
-            'h-[46px] rounded-[13px] bg-accent px-5 text-[14px] font-extrabold text-accent-foreground',
+            'h-[46px] bg-accent px-5 text-[15px] font-semibold text-accent-foreground',
             'transition-[filter] duration-[120ms] hover:brightness-[1.06] active:brightness-90',
             (!draftLabel.trim() || status === 'saving') && 'opacity-40',
           )}
@@ -281,14 +287,14 @@ function CategoryEditor({
         <button
           type="button"
           onClick={onDone}
-          className="h-[46px] rounded-[13px] border border-glass-border px-5 text-[14px] font-bold text-muted transition-colors duration-[120ms] hover:bg-foreground/5"
+          className="h-[46px] bg-men-phim px-5 text-[15px] font-medium text-muted transition-[filter] duration-[120ms] hover:brightness-110"
         >
           Huỷ
         </button>
       </div>
 
       {count > 0 && (
-        <p className="mt-3 text-[12.5px] font-medium text-muted text-pretty">
+        <p className="mt-3 text-[15px] text-muted text-pretty">
           Đổi tên và màu áp dụng cho cả {count} giao dịch cũ trong danh mục này.
         </p>
       )}

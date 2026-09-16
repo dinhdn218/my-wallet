@@ -61,23 +61,23 @@ export function BudgetRow({ row, compact }: { row: CategoryBudgetRow; compact?: 
       <div className="flex flex-col gap-2 py-2">
         <div className="flex items-center gap-2.5">
           <span
-            className="size-[9px] shrink-0 rounded-full bg-foreground/30"
+            className="size-2 shrink-0 bg-foreground/30"
             aria-hidden
           />
-          <span className="min-w-0 flex-1 text-[14px] font-bold text-foreground/66 text-pretty">
+          <span className="min-w-0 flex-1 text-[15px] text-foreground/70 text-pretty">
             {category.label}
           </span>
-          <span className="shrink-0 text-[14px] font-extrabold tabular-nums text-foreground/66">
+          <span className="shrink-0 text-[15px] font-semibold tabular-nums text-foreground/70">
             {formatVnd(row.used)}
           </span>
-          <span className="w-6 shrink-0 text-right text-[14px] text-muted" aria-hidden>
+          <span className="w-6 shrink-0 text-right text-[15px] text-muted" aria-hidden>
             —
           </span>
           {!editing && (
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="shrink-0 text-[12.5px] font-extrabold text-accent"
+              className="shrink-0 text-[15px] font-semibold text-accent"
             >
               Đặt
             </button>
@@ -103,40 +103,40 @@ export function BudgetRow({ row, compact }: { row: CategoryBudgetRow; compact?: 
       className={cn(
         'flex flex-col gap-2.5',
         row.over
-          ? 'rounded-2xl border border-negative/40 bg-negative/11 p-3.5'
+          ? 'border-2 border-negative bg-negative/12 p-3.5'
           : 'py-2',
       )}
     >
       <div className="flex items-center gap-2.5">
         <span
-          className="size-[9px] shrink-0 rounded-full"
+          className="size-2 shrink-0"
           style={{ background: category.color }}
           aria-hidden
         />
         <span
           className={cn(
-            'min-w-0 flex-1 font-bold text-pretty',
-            compact ? 'text-[14px]' : 'text-[15px]',
+            'min-w-0 flex-1 text-pretty',
+            compact ? 'text-[15px]' : 'text-[15px]',
           )}
         >
           {category.label}
         </span>
         <span
           className={cn(
-            'shrink-0 font-extrabold tabular-nums',
-            compact ? 'text-[14px]' : 'text-[15px]',
+            'shrink-0 font-semibold tabular-nums',
+            compact ? 'text-[15px]' : 'text-[15px]',
           )}
         >
           {formatVnd(row.used, { unit: false })}
-          <span className="font-bold text-muted"> / {formatVnd(row.limit)}</span>
+          <span className="font-normal text-muted"> / {formatVnd(row.limit)}</span>
         </span>
       </div>
 
-      <div className="h-2 overflow-hidden rounded-full bg-foreground/10">
+      <div className="flex h-2.5 bg-men-sau">
         <div
           className={cn(
-            'h-full rounded-full transition-[width] duration-500',
-            row.over ? 'bg-negative' : 'bg-accent',
+            'h-full transition-[width] duration-500',
+            row.over ? 'bg-negative' : 'bg-foreground',
           )}
           // share đã kẹp ở 1 nên thanh không bao giờ vẽ quá 100%.
           style={{ width: `${row.share * 100}%` }}
@@ -145,8 +145,8 @@ export function BudgetRow({ row, compact }: { row: CategoryBudgetRow; compact?: 
 
       <div className="flex items-center gap-3">
         {row.over ? (
-          <p className="min-w-0 flex-1 text-[12.5px] font-semibold">
-            <span className="font-mono text-[10.5px] font-bold tracking-[.16em] text-negative uppercase">
+          <p className="min-w-0 flex-1 text-[15px]">
+            <span className="font-mono text-[11px] font-medium tracking-[.2em] text-negative uppercase">
               Vượt hạn mức
             </span>
             <span className="text-muted">
@@ -155,7 +155,7 @@ export function BudgetRow({ row, compact }: { row: CategoryBudgetRow; compact?: 
             </span>
           </p>
         ) : (
-          <p className="min-w-0 flex-1 text-[12.5px] font-semibold text-muted">
+          <p className="min-w-0 flex-1 text-[15px] text-muted">
             Còn {formatVnd(remaining)} · {percent}% hạn mức
           </p>
         )}
@@ -168,14 +168,14 @@ export function BudgetRow({ row, compact }: { row: CategoryBudgetRow; compact?: 
                 setDraft(String(row.limit))
                 setEditing(true)
               }}
-              className="text-[12.5px] font-extrabold text-accent"
+              className="text-[15px] font-semibold text-accent"
             >
               Sửa
             </button>
             <button
               type="button"
               onClick={() => setConfirmingClear(true)}
-              className="text-[12.5px] font-extrabold text-negative"
+              className="text-[15px] font-semibold text-negative"
             >
               Gỡ
             </button>
@@ -195,8 +195,8 @@ export function BudgetRow({ row, compact }: { row: CategoryBudgetRow; compact?: 
       )}
 
       {confirmingClear && (
-        <div className="flex flex-col gap-2.5 rounded-2xl border border-negative/40 bg-negative/11 p-3.5">
-          <p className="text-[13px] font-bold text-pretty">
+        <div className="flex flex-col gap-2.5 border-2 border-negative bg-negative/12 p-3.5">
+          <p className="text-[15px] text-pretty">
             Gỡ hạn mức của “{category.label}”? Khoản đã chi vẫn giữ nguyên, chỉ
             không còn theo dõi hạn mức nữa.
           </p>
@@ -205,14 +205,14 @@ export function BudgetRow({ row, compact }: { row: CategoryBudgetRow; compact?: 
               type="button"
               onClick={clear}
               disabled={busy}
-              className="h-[44px] shrink-0 rounded-[13px] bg-negative px-4 text-[13px] font-extrabold text-white disabled:opacity-60"
+              className="h-[44px] shrink-0 bg-negative px-4 text-[15px] font-semibold text-negative-foreground disabled:opacity-60"
             >
               {busy ? 'Đang gỡ…' : 'Gỡ hạn mức'}
             </button>
             <button
               type="button"
               onClick={() => setConfirmingClear(false)}
-              className="h-[44px] shrink-0 rounded-[13px] border border-glass-border px-4 text-[13px] font-bold text-muted"
+              className="h-[44px] shrink-0 bg-men-phim px-4 text-[15px] font-medium text-muted"
             >
               Huỷ
             </button>
@@ -252,14 +252,14 @@ function LimitInput({
         }}
         placeholder="VD: 2tr"
         aria-label={`Hạn mức cho ${label}`}
-        className="h-[44px] min-w-0 flex-1 rounded-[13px] border border-glass-border bg-well px-3 text-[14px] font-bold outline-none"
+        className="h-[44px] min-w-0 flex-1 bg-men-sau px-3 text-[15px] outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset"
       />
       <button
         type="button"
         onClick={onSave}
         disabled={!valid}
         className={cn(
-          'h-[44px] shrink-0 rounded-[13px] bg-accent px-4 text-[13px] font-extrabold text-accent-foreground',
+          'h-[44px] shrink-0 bg-accent px-4 text-[15px] font-semibold text-accent-foreground',
           !valid && 'opacity-40',
         )}
       >
@@ -268,7 +268,7 @@ function LimitInput({
       <button
         type="button"
         onClick={onCancel}
-        className="h-[44px] shrink-0 rounded-[13px] border border-glass-border px-3 text-[13px] font-bold text-muted"
+        className="h-[44px] shrink-0 bg-men-phim px-3 text-[15px] font-medium text-muted"
       >
         Huỷ
       </button>

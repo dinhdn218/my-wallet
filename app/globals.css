@@ -8,82 +8,140 @@
 @custom-variant light ([data-theme="light"] &);
 
 /* ------------------------------------------------------------------ *
- * Ví Riêng — design tokens (hai chế độ). Nguồn: design handoff.
- * Token shadcn (--popover, --border, --primary…) map sang bảng màu này
- * để Dialog/Sheet/Select kế thừa đúng thiết kế.
+ * Ví Riêng — "Bảng Giá Quán"
+ *
+ * Thế giới: tấm bảng giá sơn tay treo trong quán ăn — men sắt tráng xanh rêu,
+ * chữ sơn stencil trắng ngà, thẻ giá giấy treo dây kẽm.
+ *
+ * Ba nguyên tắc chi phối mọi token dưới đây:
+ *   1. Men chiếm NGUYÊN VÙNG, không phải accent rắc lên nền trung tính.
+ *   2. Cấu trúc đọc bằng KHOẢNG HỞ và vệt sơn, không bằng border bo góc.
+ *      Vì vậy --radius = 0: trong thế giới này không có thẻ bo góc nào.
+ *   3. Mọi màu chữ ở đây đã kiểm tra tương phản trên nền men sáng nhất
+ *      (#14604A, đỉnh gradient) — không hạ giá trị nào xuống mà không đo lại.
  * ------------------------------------------------------------------ */
 
 :root,
 [data-theme="dark"] {
-  --canvas: #0a0908;
-  --background: #0e0c0a;
-  --foreground: #f6f1e9;
-  --muted: rgba(246, 241, 233, 0.5);
-  --accent: #f5ac3c;
-  --accent-foreground: #1b1206;
-  --positive: #3ed6b5;
-  --negative: #ff7a9c;
-  --negative-foreground: #1b0a10;
+  /* mặt bảng */
+  --men: #0f4c3a;
+  --men-dam: #0a382b;      /* vùng lõm: bàn phím, ô nhập */
+  --men-sau: #082e23;      /* sâu nhất: ô hiển thị số đang gõ */
+  --men-phim: #11553f;     /* mặt phím */
+  --men-vien: #2e6b55;     /* dây kẽm, đường kẻ mảnh */
 
-  /* lớp kính */
-  --glass: rgba(255, 255, 255, 0.055);
-  --glass-border: rgba(255, 255, 255, 0.13);
-  --glass-blur: 20px;
+  --canvas: #0a2e23;
+  --background: var(--men);
+  --foreground: #f2e8d5;   /* sơn trắng ngà */
 
-  /* ô nhập, đường kẻ, scrim */
-  --well: rgba(0, 0, 0, 0.22);
-  --line: rgba(255, 255, 255, 0.08);
-  --scrim: rgb(6 5 4 / 0.55);
+  /* 5.15:1 trên đỉnh men sáng nhất — KHÔNG hạ xuống #A8CBB9 (4.25:1) */
+  --muted: #c2dcce;
 
-  /* màu biểu đồ, theo thứ tự lát donut */
-  --c1: var(--accent);
-  --c2: var(--positive);
-  --c3: var(--negative);
+  --accent: #edc948;       /* vàng nghệ — khoản thu, danh mục đang chọn */
+  --accent-foreground: #3a2e00;
+  --positive: #edc948;     /* thu = vàng nghệ, cùng một tín hiệu */
+  --negative: #c9301a;     /* đỏ son — vượt hạn mức, nút ghi (5.36:1 với trắng) */
+  --negative-foreground: #ffffff;
+
+  /* thẻ giá giấy treo dây kẽm */
+  --the: #e8dcc4;
+  --the-muc: #1a1714;
+
+  --well: var(--men-sau);
+  --line: var(--men-vien);
+  --scrim: rgb(6 20 15 / 0.62);
+
+  /* màu biểu đồ — giữ nguyên hue của danh mục cũ để dữ liệu người dùng
+     không đổi màu sau khi redesign */
+  --c1: #edc948;
+  --c2: #3ed6b5;
+  --c3: #ff7a9c;
   --c4: oklch(0.78 0.13 265);
   --c5: oklch(0.76 0.14 320);
-  --c6: rgba(246, 241, 233, 0.22);
+  --c6: #b9ac96;
 
   /* token shadcn */
-  --card: var(--glass);
+  --card: transparent;
   --card-foreground: var(--foreground);
-  --popover: #14110e;
+  --popover: var(--men-dam);
   --popover-foreground: var(--foreground);
-  --primary: var(--accent);
-  --primary-foreground: var(--accent-foreground);
-  --secondary: rgba(255, 255, 255, 0.08);
+  --primary: var(--negative);
+  --primary-foreground: var(--negative-foreground);
+  --secondary: var(--men-phim);
   --secondary-foreground: var(--foreground);
   --muted-foreground: var(--muted);
   --destructive: var(--negative);
-  --border: var(--glass-border);
-  --input: var(--glass-border);
+  --border: var(--men-vien);
+  --input: var(--men-vien);
   --ring: var(--accent);
-  --radius: 0.875rem;
+
+  /* Không có thẻ bo góc trong thế giới này. */
+  --radius: 0rem;
 }
 
+/*
+ * Chế độ sáng = tấm bảng men NGOÀI NẮNG, không phải "đảo ngược sang nền trắng".
+ * Mặt bảng vẫn là men xanh; thứ đổi là độ sáng của men và độ dày của sơn, đúng
+ * như một tấm bảng thật dưới hai điều kiện ánh sáng khác nhau.
+ */
 [data-theme="light"] {
-  --canvas: #ede7dc;
-  --background: #fbf7f0;
-  --foreground: #1b1714;
-  --muted: rgba(27, 23, 20, 0.57);
-  --accent: #a85f00;
+  /*
+   * Tấm bảng men BẠC MÀU dưới nắng gắt — nền men nhạt, chữ là mực xanh đậm.
+   *
+   * Ba lần sửa để tới đây, ghi lại vì lý do kỹ thuật quan trọng:
+   *   1. #bfd4c6 + mực đậm → mất thế giới, thành app nền sáng có ám xanh.
+   *   2. #296049 giữ sơn ngà làm chữ → đúng tinh thần nhưng chỉ sáng gấp 1,7x.
+   *   3. #347557 vẫn giữ sơn ngà → sáng gấp 2,5x, NHƯNG cả hai chế độ vẫn
+   *      nằm trong vùng tối (L .14 vs .06), mắt đọc là "hai sắc xanh đậm".
+   *
+   * Nguyên nhân gốc: ép sơn ngà (#fffdf7) làm chữ thì nền men BỊ CHẶN TRẦN ở
+   * L≈0.14 — sáng hơn nữa là chữ tụt dưới 4.5:1. Muốn sáng thật thì buộc phải
+   * ĐẢO CHIỀU: mực đậm trên nền nhạt.
+   *
+   * Đảo chiều KHÔNG phải bỏ thế giới. Một tấm biển men phơi nắng nhiều năm
+   * đúng là bạc màu đi và chữ sơn thành vết đậm trên nền nhạt — đây mới là
+   * tấm bảng ngoài trời thật, còn bản tối là tấm bảng trong quán.
+   *
+   * Kết quả: L 0.712 so với 0.056 — sáng gấp 12,8 lần, không thể nhầm.
+   */
+  --men: #cfe0d2;
+  --men-dam: #b2c9b8;      /* vùng lõm: cột ghi — TỐI hơn nền, ngược bản tối */
+  --men-sau: #a2bdaa;      /* sâu nhất: ô nhập số */
+  --men-phim: #dceade;     /* mặt phím — nổi LÊN khỏi nền */
+  --men-vien: #5f8269;     /* dây kẽm, đường kẻ */
+
+  --canvas: #b2c9b8;
+  --background: var(--men);
+  --foreground: #0b3325;   /* mực men — 10.07:1 trên nền men bạc */
+  --muted: #2a5544;        /* 6.14:1 */
+
+  --accent: #6e4c00;       /* vàng nghệ ngả nâu dưới nắng — 5.65:1 làm chữ */
   --accent-foreground: #ffffff;
-  --positive: #0b7566;
-  --negative: #b32455;
+  --positive: #6e4c00;
+
+  --negative: #b32d12;     /* đỏ son — 4.62:1 trên men, 6.36:1 với chữ trắng */
   --negative-foreground: #ffffff;
 
-  --glass: rgba(255, 255, 255, 0.62);
-  --glass-border: rgba(27, 23, 20, 0.14);
-  --glass-blur: 20px;
+  /* Thẻ giá: giấy trắng ngà, sáng hơn cả mặt bảng */
+  --the: #fffcf2;
+  --the-muc: #0b3325;
 
-  --well: rgba(255, 255, 255, 0.7);
-  --line: rgba(27, 23, 20, 0.12);
-  --scrim: rgb(6 5 4 / 0.35);
+  --well: var(--men-sau);
+  --line: var(--men-vien);
+  --scrim: rgb(10 26 20 / 0.42);
 
-  --c4: oklch(0.55 0.16 265);
-  --c5: oklch(0.55 0.17 320);
-  --c6: rgba(27, 23, 20, 0.25);
+  /* Màu biểu đồ phải đậm lại để đọc được trên nền sáng */
+  --c1: #6e4c00;
+  --c2: #0f7a63;
+  --c3: #b3254e;
+  --c4: oklch(0.48 0.16 265);
+  --c5: oklch(0.48 0.17 320);
+  --c6: #5d6b62;
 
-  --popover: #fffdf9;
+  --popover: #fffcf2;
+  --popover-foreground: var(--foreground);
+  --card: transparent;
+  --secondary: var(--men-phim);
 }
 
 @theme inline {
@@ -96,10 +154,16 @@
   --color-positive: var(--positive);
   --color-negative: var(--negative);
   --color-negative-foreground: var(--negative-foreground);
-  --color-glass: var(--glass);
-  --color-glass-border: var(--glass-border);
   --color-line: var(--line);
   --color-well: var(--well);
+
+  --color-men: var(--men);
+  --color-men-dam: var(--men-dam);
+  --color-men-sau: var(--men-sau);
+  --color-men-phim: var(--men-phim);
+  --color-men-vien: var(--men-vien);
+  --color-the: var(--the);
+  --color-the-muc: var(--the-muc);
 
   --color-c1: var(--c1);
   --color-c2: var(--c2);
@@ -123,8 +187,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sans: var(--font-be-vietnam-pro), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-sans: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
 }
 
 @layer base {
@@ -146,10 +210,133 @@ body {
     color 0.18s ease;
 }
 
+/*
+ * Bề mặt men tráng: ánh sáng đọng ở góc trên-trái, bóng đổ ở góc dưới-phải, và
+ * hạt men lấm tấm. Đây là VẬT LIỆU của thế giới, không phải halo trang trí —
+ * xem khối OWN-WORLD trong .impeccable/surfaces/.
+ */
+.men-mat {
+  background:
+    radial-gradient(120% 90% at 18% 4%, color-mix(in oklab, var(--men) 84%, white) 0%, transparent 58%),
+    radial-gradient(90% 70% at 86% 92%, color-mix(in oklab, var(--men) 88%, black) 0%, transparent 60%),
+    var(--men);
+  position: relative;
+}
+
+/*
+ * Hạt men và vệt cọ — dùng SVG feTurbulence nội tuyến làm nhiễu thật, không
+ * phải vài chấm radial-gradient rải tay. Một mặt men tráng có hạt không đều và
+ * vệt sơn còn để lại dấu cọ; thiếu nó thì "bảng sơn tay" chỉ còn là ô màu phẳng.
+ * opacity thấp để không ăn vào tương phản chữ đã đo.
+ */
+.men-mat::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/*
+ * Vệt cọ — hạt nhiễu ở trên là hạt men, nhưng men sơn TAY còn có dấu cọ kéo
+ * ngang, dày mỏng không đều. feTurbulence kéo giãn mạnh theo trục x
+ * (baseFrequency 0.9 ngang / 0.012 dọc) cho ra sọc dài có hướng thay vì hạt
+ * đẳng hướng; đó là khác biệt giữa "có texture" và "sơn tay".
+ */
+.men-mat::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='240'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.012' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='600' height='240' filter='url(%23b)'/%3E%3C/svg%3E");
+}
+
+/*
+ * Mép men sứt: một dải mảnh chạy dọc mép phải cột ghi, nơi hai vùng men gặp
+ * nhau. Không dùng border — men thật không có đường kẻ, nó có chỗ dày chỗ mỏng.
+ */
+.mep-men {
+  position: relative;
+}
+.mep-men::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  width: 2px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in oklab, var(--foreground) 14%, transparent) 8%,
+    transparent 22%,
+    color-mix(in oklab, var(--foreground) 9%, transparent) 46%,
+    transparent 61%,
+    color-mix(in oklab, var(--foreground) 16%, transparent) 78%,
+    transparent 95%
+  );
+}
+
+/*
+ * Đường chấm nối tên món với giá — đúng lối bảng giá quán. Dùng background
+ * thay vì border-bottom để chấm tròn đều và không dính vào baseline chữ.
+ */
+.duong-cham {
+  background-image: radial-gradient(circle, var(--men-vien) 1px, transparent 1px);
+  background-size: 6px 1px;
+  background-repeat: repeat-x;
+}
+
+/*
+ * Nhãn đo đạc: mono 11px in hoa, một tracking duy nhất cho cả app.
+ * Trước đây rải rác .2em/.1em/.08em cho cùng một vai trò — đó là trôi, không
+ * phải hệ thống.
+ */
+.nhan-do {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/*
+ * Vân men trên nền SÁNG phải ngược chiều: nhiễu trắng + overlay gần như tàng
+ * hình trên nền nhạt. Đổi sang multiply để hạt và vệt cọ đọc thành vết ĐẬM,
+ * đúng như men bạc màu có vết mòn sẫm.
+ */
+[data-theme="light"] .men-mat::after {
+  mix-blend-mode: multiply;
+  opacity: 0.07;
+}
+[data-theme="light"] .men-mat::before {
+  mix-blend-mode: multiply;
+  opacity: 0.06;
+}
+
 /* Thanh cuộn ẩn trong vùng nội dung */
 .no-scrollbar {
   scrollbar-width: none;
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/*
+ * Bề mặt trình duyệt cũng thuộc thiết kế: bôi đen, con trỏ, thanh cuộn.
+ * Mặc định của trình duyệt không thuộc hệ thống nào cả.
+ */
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+html {
+  caret-color: var(--accent);
+  scrollbar-color: var(--men-vien) transparent;
 }

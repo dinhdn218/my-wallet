@@ -61,27 +61,28 @@ export function MigrationPrompt({
       role="dialog"
       aria-modal="true"
       aria-labelledby="migration-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'var(--scrim)' }}
     >
-      <div className="w-full max-w-[420px] rounded-[20px] border border-glass-border bg-card p-5 shadow-2xl md:p-6">
+      <div className="men-mat w-full max-w-[420px] p-6 md:p-7">
         <h2
           id="migration-title"
-          className="text-[18px] leading-tight font-extrabold tracking-[-.015em]"
+          className="text-[19px] leading-tight font-semibold tracking-[-.015em]"
         >
           Chuyển dữ liệu trên máy này lên tài khoản?
         </h2>
-        <p className="mt-2.5 text-[13.5px] leading-relaxed text-muted">
-          Tìm thấy <strong className="text-foreground">{txCount} giao dịch</strong>
+        <p className="mt-2.5 text-[15px] leading-relaxed text-muted text-pretty">
+          Tìm thấy <strong className="font-semibold text-foreground">{txCount} giao dịch</strong>
           {budgetCount > 0 && (
             <>
-              {' '}và <strong className="text-foreground">{budgetCount} hạn mức</strong>
+              {' '}và <strong className="font-semibold text-foreground">{budgetCount} hạn mức</strong>
             </>
           )}{' '}
           đã lưu trên máy này. Chuyển lên tài khoản để xem được trên mọi thiết bị.
         </p>
 
         {status === 'error' && (
-          <p role="alert" className="mt-3 text-[12.5px] font-semibold text-negative">
+          <p role="alert" className="mt-3 text-[15px] font-medium text-negative">
             Chuyển không xong. Dữ liệu trên máy vẫn còn nguyên, thử lại được.
           </p>
         )}
@@ -91,7 +92,7 @@ export function MigrationPrompt({
             type="button"
             onClick={decline}
             disabled={saving}
-            className="h-10 rounded-[12px] border border-glass-border px-4 text-[13.5px] font-bold text-muted transition-colors hover:text-foreground disabled:opacity-60"
+            className="h-11 bg-men-phim px-4 text-[15px] font-medium text-muted transition-[filter] hover:brightness-110 disabled:opacity-60"
           >
             Bỏ qua
           </button>
@@ -99,7 +100,7 @@ export function MigrationPrompt({
             type="button"
             onClick={upload}
             disabled={saving}
-            className="h-10 rounded-[12px] bg-accent px-4 text-[13.5px] font-extrabold text-accent-foreground transition-opacity disabled:opacity-60"
+            className="h-11 bg-accent px-4 text-[15px] font-semibold text-accent-foreground transition-[filter] hover:brightness-110 disabled:opacity-60"
           >
             {saving ? 'Đang chuyển…' : 'Chuyển lên tài khoản'}
           </button>
