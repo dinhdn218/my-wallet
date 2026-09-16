@@ -171,10 +171,11 @@ mỗi chuỗi khớp hai lần.
 
 ## Còn tồn
 
-- **Migration `001-drop-account-id.sql` CHƯA chạy.** Cột `account_id` vẫn
-  `not null` trong Postgres, nên app mới (không gửi cột đó) sẽ lỗi khi ghi giao
-  dịch cho tới khi migration được chạy. Xem file đó để biết thứ tự an toàn.
-- Bộ E2E đã cập nhật selector nhưng **chưa chạy lại được** vì lý do trên.
+- **`schema.sql` đã bỏ `account_id`** — DB dựng mới chỉ cần chạy `schema.sql`,
+  không phải chạy migration nào. DB đã dựng từ bản schema cũ thì chạy
+  `supabase/migrations/001-drop-account-id.sql` (cả 3 bước, kể cả bước dựng lại
+  `migrate_local_data`).
+- Bộ E2E đã cập nhật selector nhưng **chưa chạy lại được** kể từ lần đổi này.
 - `playwright.config.ts` không tự nạp `.env.local`; phải `set -a && . ./.env.local`
   trước khi chạy E2E.
 - `docs/superpowers/` là spec/plan của thiết kế **đầu tiên**, đã lỗi thời.

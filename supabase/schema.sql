@@ -42,6 +42,10 @@ create table public.categories (
 -- amount_vnd LUÔN DƯƠNG, dấu suy ra từ `type` (bất biến của types/transaction.ts).
 -- Dùng bigint chứ không int: int4 chỉ tới ~2,1 tỷ đồng, một khoản mua xe hay đặt
 -- cọc nhà là vượt.
+--
+-- KHÔNG có cột account_id ("nguồn tiền") — đã gỡ có chủ ý, xem
+-- supabase/migrations/001-drop-account-id.sql và PRODUCT.md. App không gửi cột
+-- đó nữa, nên dựng lại nó dạng `not null` sẽ làm MỌI lần ghi giao dịch hỏng.
 -- ---------------------------------------------------------------------------
 create table public.transactions (
   id          uuid primary key default gen_random_uuid(),
@@ -49,7 +53,6 @@ create table public.transactions (
   type        text not null check (type in ('income', 'expense')),
   amount_vnd  bigint not null check (amount_vnd > 0),
   category_id text not null,
-  account_id  text not null check (account_id in ('techcombank', 'cash', 'momo')),
   note        text check (note is null or length(note) <= 120),
   occurred_at timestamptz not null,
   created_at  timestamptz not null default now(),
@@ -198,7 +201,7 @@ create trigger on_auth_user_created
 -- payload:
 -- {
 --   "categories":   [{"id","label","color","sortOrder"}],
---   "transactions": [{"type","amountVnd","categoryId","accountId","note","occurredAt","createdAt"}],
+--   "transactions": [{"type","amountVnd","categoryId","note","occurredAt","createdAt"}],
 --   "budgets":      [{"month","categoryId","limitVnd"}]
 -- }
 --
@@ -232,12 +235,11 @@ begin
 
   -- 2. Giao dịch.
   insert into public.transactions
-    (user_id, type, amount_vnd, category_id, account_id, note, occurred_at, created_at)
+    (user_id, type, amount_vnd, category_id, note, occurred_at, created_at)
   select uid,
          t ->> 'type',
          (t ->> 'amountVnd')::bigint,
          t ->> 'categoryId',
-         t ->> 'accountId',
          nullif(t ->> 'note', ''),
          (t ->> 'occurredAt')::timestamptz,
          coalesce((t ->> 'createdAt')::timestamptz, now())

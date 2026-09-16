@@ -42,3 +42,61 @@ alter table public.transactions
 
 -- Ghi chú: CHECK constraint account_id in ('techcombank','cash','momo') tự biến
 -- mất theo cột, không cần drop riêng.
+
+
+-- ---------------------------------------------------------------------------
+-- BƯỚC 3 — Dựng lại migrate_local_data (bắt buộc, chạy cùng BƯỚC 2)
+-- ---------------------------------------------------------------------------
+-- Thân hàm cũ còn insert vào account_id, mà lib/migrate-local.ts đã bỏ field
+-- 'accountId' khỏi payload. Bỏ qua bước này thì luồng di trú hỏng cả hai chiều:
+-- còn cột -> insert null vào cột not null; bỏ cột -> 42703 column does not exist.
+--
+-- Bản schema.sql hiện tại đã bỏ account_id, nên DB dựng mới KHÔNG cần file này.
+create or replace function public.migrate_local_data(payload jsonb)
+returns void
+language plpgsql
+as $$
+declare
+  uid uuid := auth.uid();
+begin
+  if uid is null then
+    raise exception 'Chưa đăng nhập';
+  end if;
+
+  insert into public.categories (user_id, id, label, color, sort_order)
+  select uid,
+         c ->> 'id',
+         c ->> 'label',
+         c ->> 'color',
+         coalesce((c ->> 'sortOrder')::int, 0)
+  from jsonb_array_elements(coalesce(payload -> 'categories', '[]'::jsonb)) as c
+  on conflict (user_id, id) do update
+    set label = excluded.label,
+        color = excluded.color,
+        sort_order = excluded.sort_order;
+
+  insert into public.transactions
+    (user_id, type, amount_vnd, category_id, note, occurred_at, created_at)
+  select uid,
+         t ->> 'type',
+         (t ->> 'amountVnd')::bigint,
+         t ->> 'categoryId',
+         nullif(t ->> 'note', ''),
+         (t ->> 'occurredAt')::timestamptz,
+         coalesce((t ->> 'createdAt')::timestamptz, now())
+  from jsonb_array_elements(coalesce(payload -> 'transactions', '[]'::jsonb)) as t;
+
+  insert into public.budgets (user_id, month, category_id, limit_vnd)
+  select uid,
+         b ->> 'month',
+         b ->> 'categoryId',
+         (b ->> 'limitVnd')::bigint
+  from jsonb_array_elements(coalesce(payload -> 'budgets', '[]'::jsonb)) as b
+  where (b ->> 'limitVnd')::bigint > 0
+    and exists (
+      select 1 from public.categories c
+      where c.user_id = uid and c.id = b ->> 'categoryId'
+    )
+  on conflict (user_id, month, category_id) do nothing;
+end;
+$$;
