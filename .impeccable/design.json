@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-09-16T00:00:00.000Z",
-  "title": "Design System: Bảng Chi",
+  "title": "Design System: Ví Của Tôi",
   "extensions": {
     "colorMeta": {
       "men": {
@@ -373,8 +373,8 @@
       "kind": "custom",
       "refersTo": "headline",
       "description": "A turmeric square — a paint swatch on the board. Unrounded like everything else in this world.",
-      "html": "<div class=\"ds-brand\"><span class=\"ds-brand-mark\"></span><span class=\"ds-brand-name\">Bảng Chi</span></div>",
-      "css": ".ds-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-oswald), sans-serif; color: var(--foreground, #f2e8d5); } .ds-brand-mark { width: 22px; height: 22px; flex-shrink: 0; background: var(--accent, #edc948); border-radius: 0; } .ds-brand-name { font-size: 17px; font-weight: 600; letter-spacing: .01em; }"
+      "html": "<div class=\"ds-brand\"><svg class=\"ds-brand-mark\" viewBox=\"0 0 32 32\" fill=\"var(--accent, #edc948)\" fill-rule=\"evenodd\"><path d=\"M0 0h32v32H0V0zm9 8h5l2 11 2-11h5l-4.5 16h-5L9 8z\"/></svg><span class=\"ds-brand-name\">Ví Của Tôi</span></div>",
+      "css": ".ds-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-oswald), sans-serif; color: var(--foreground, #f2e8d5); } .ds-brand-mark { width: 22px; height: 22px; flex-shrink: 0; } .ds-brand-name { font-size: 17px; font-weight: 600; letter-spacing: .01em; }"
     }
   ],
   "narrative": {

@@ -1,4 +1,4 @@
-# Bảng Chi — quản lý chi tiêu cá nhân
+# Ví Của Tôi — quản lý chi tiêu cá nhân
 
 App web ghi thu chi cá nhân bằng tiếng Việt, đơn vị VND. Dữ liệu lưu trên
 **Supabase (Postgres)**, đăng nhập bằng **magic link qua email** — đổi máy chỉ

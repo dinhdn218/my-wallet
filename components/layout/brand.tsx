@@ -1,3 +1,4 @@
+import { Logo } from '@/components/layout/logo'
 import { cn } from '@/lib/utils'
 
 const SIZES = {
@@ -7,8 +8,10 @@ const SIZES = {
 } as const
 
 /**
- * Dấu hiệu nhận diện: một ô vuông vàng nghệ — vệt sơn mẫu trên tấm bảng, không
- * bo góc như mọi thứ khác trong thế giới này.
+ * Dấu hiệu nhận diện: logo + tên, đi liền nhau.
+ *
+ * Ô vuông vàng nghệ của bản trước nay có chữ V khoét thủng (components/layout/logo.tsx)
+ * — vẫn là vệt sơn trên tấm bảng, chỉ thêm khuôn stencil. Vẫn không bo góc.
  */
 export function Brand({
   size = 'desktop',
@@ -21,9 +24,9 @@ export function Brand({
 
   return (
     <div className={cn('flex items-center gap-2.5', className)}>
-      <span className={cn('shrink-0 bg-accent', s.mark)} aria-hidden />
+      <Logo className={cn('shrink-0', s.mark)} />
       <span className={cn('font-semibold tracking-[.01em]', s.text)}>
-        Bảng Chi
+        Ví Của Tôi
       </span>
     </div>
   )

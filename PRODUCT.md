@@ -82,7 +82,7 @@ việc ghi nhanh hơn hoặc rõ hơn — không thêm để cho đầy màn.
 
 ## Brand Commitments
 
-Tên sản phẩm: **Bảng Chi**. Toàn bộ giao diện bằng tiếng Việt, giọng văn thân
+Tên sản phẩm: **Ví Của Tôi**. Toàn bộ giao diện bằng tiếng Việt, giọng văn thân
 mật, ngắn, không thuật ngữ tài chính — như cách người dùng tự nói với mình
 ("Còn 4 ngày", "Chi ít hơn tháng trước"). Không có ràng buộc về logo, màu sắc
 hay font: bản thiết kế lại được tự do chọn.

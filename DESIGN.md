@@ -1,5 +1,5 @@
 ---
-name: Bảng Chi
+name: Ví Của Tôi
 description: A hand-painted Vietnamese eatery price board for tracking personal spending.
 colors:
   men: "#0f4c3a"
@@ -139,7 +139,7 @@ components:
     height: "44px"
 ---
 
-# Design System: Bảng Chi
+# Design System: Ví Của Tôi
 
 ## Overview
 

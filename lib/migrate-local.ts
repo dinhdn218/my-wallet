@@ -11,7 +11,7 @@ import type { Transaction } from '@/types/transaction'
  */
 
 /**
- * ⚠️ Tiền tố 'vi-rieng/' là tên CŨ của app (nay là "Bảng Chi") và phải GIỮ
+ * ⚠️ Tiền tố 'vi-rieng/' là tên CŨ của app (nay là "Ví Của Tôi") và phải GIỮ
  * NGUYÊN. Khoá lưu trữ là định danh dữ liệu, không phải thương hiệu: đổi nó
  * làm cache và BẢN SAO LƯU trước-Supabase của người dùng thành mồ côi, luồng
  * di trú sẽ không tìm thấy chúng nữa. Đổi tên app không phải lý do để mất dữ liệu.

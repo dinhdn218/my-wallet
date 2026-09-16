@@ -7,7 +7,7 @@ related_targets: ["app/(app)/layout.tsx","app/globals.css","app/(app)/giao-dich/
 
 ## Scope
 
-Toàn bộ vỏ ứng dụng Bảng Chi: màn ghi nhanh (mặc định), tổng quan, giao dịch,
+Toàn bộ vỏ ứng dụng Ví Của Tôi: màn ghi nhanh (mặc định), tổng quan, giao dịch,
 ngân sách, danh mục, báo cáo, đăng nhập. Visitor mode: **Operate**.
 
 Người dùng: một người, tiếng Việt, VND. Hai cảnh dùng — đứng ở quán ghi một
