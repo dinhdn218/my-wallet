@@ -23,7 +23,12 @@ import {
   upsertBudget,
 } from '@/lib/supabase/queries'
 import type { BalanceMark } from '@/types/balance'
-import type { NewTransaction, Transaction, TxType } from '@/types/transaction'
+import type {
+  NewTransaction,
+  Transaction,
+  TransactionPatch,
+  TxType,
+} from '@/types/transaction'
 
 export type { NewTransaction, Transaction, TxType }
 export type { BalanceMark }
@@ -72,7 +77,7 @@ interface ExpenseState {
   signOutAndClear: () => void
 
   addTransaction: (input: NewTransaction) => Promise<string>
-  updateTransaction: (id: string, patch: Partial<NewTransaction>) => Promise<void>
+  updateTransaction: (id: string, patch: TransactionPatch) => Promise<void>
   removeTransaction: (id: string) => Promise<void>
   setActiveMonth: (month: string) => void
   setHasHydrated: (value: boolean) => void

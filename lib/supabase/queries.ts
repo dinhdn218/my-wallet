@@ -2,7 +2,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Category, CategoryId } from '@/lib/categories'
 import type { Budgets } from '@/lib/seed-data'
 import type { BalanceMark } from '@/types/balance'
-import type { NewTransaction, Transaction } from '@/types/transaction'
+import type {
+  NewTransaction,
+  Transaction,
+  TransactionPatch,
+} from '@/types/transaction'
 import {
   rowToBalanceMark,
   rowToCategory,
@@ -98,9 +102,10 @@ export async function insertTransaction(
 export async function updateTransactionRow(
   supabase: SupabaseClient,
   id: string,
-  patch: Partial<NewTransaction>,
+  patch: TransactionPatch,
 ): Promise<Transaction> {
   // Chỉ gửi cột thực sự đổi: gửi undefined sẽ ghi đè thành null.
+  // Riêng `note`: null là CỐ Ý xoá tên, khác undefined là "không đụng tới".
   const row: Record<string, unknown> = {}
   if (patch.type !== undefined) row.type = patch.type
   if (patch.amountVnd !== undefined) row.amount_vnd = patch.amountVnd

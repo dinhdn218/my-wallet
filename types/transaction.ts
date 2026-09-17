@@ -29,3 +29,15 @@ export interface Transaction {
 }
 
 export type NewTransaction = Omit<Transaction, 'id' | 'createdAt'>
+
+/**
+ * Patch cho updateTransaction. Khác `Partial<NewTransaction>` ở đúng một chỗ:
+ * `note` nhận thêm `null`.
+ *
+ * Cần thiết vì `note?: string` không phân biệt được hai ý ngược nhau — bỏ
+ * trường đi nghĩa là "giữ nguyên tên cũ", nên không còn cách nào nói "xoá tên
+ * đi". `null` là lời nói đó; `undefined` vẫn giữ nghĩa "không đụng tới".
+ */
+export type TransactionPatch = Partial<Omit<NewTransaction, 'note'>> & {
+  note?: string | null
+}

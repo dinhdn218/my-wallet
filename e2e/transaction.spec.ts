@@ -99,3 +99,27 @@ test('các ô nhập trên một hàng cao bằng nhau', async ({ page }) => {
 
   expect(Math.abs(date!.height - select!.height)).toBeLessThan(2)
 })
+
+/*
+ * Lỗi thật người dùng báo: xoá trắng ô tên rồi bấm Lưu mà tên cũ vẫn còn.
+ * transaction-edit gửi `note.trim() || undefined`, mà updateTransactionRow hiểu
+ * undefined là "cột này không đổi, đừng gửi" — nên thao tác xoá tên im lặng
+ * không có tác dụng. Phải gửi null mới là "xoá tên đi".
+ *
+ * Kiểm cả sau khi tải lại: chỉ đổi state trong máy mà chưa ghi xuống Postgres
+ * thì lỗi vẫn còn nguyên, chỉ là khó thấy hơn.
+ */
+test('xoá trắng tên giao dịch rồi lưu thì tên biến mất hẳn', async ({ page }) => {
+  await table(page).getByTestId(`tx-row-${SEED_IDS.cafeHighlands}`).click()
+
+  const name = page.getByLabel('Tên giao dịch')
+  await expect(name).toBeVisible()
+  await name.fill('')
+  await page.getByRole('button', { name: 'Lưu' }).click()
+
+  await expect(name).toBeHidden()
+  await expect(table(page).getByText('Cafe Highlands')).toHaveCount(0)
+
+  await page.reload()
+  await expect(table(page).getByText('Cafe Highlands')).toHaveCount(0)
+})
