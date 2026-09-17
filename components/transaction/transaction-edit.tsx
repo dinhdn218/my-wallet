@@ -64,7 +64,7 @@ export function TransactionEdit({
     return (
       <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
         <DialogContent
-          className={cn(modalGlass, 'w-[480px] gap-4 p-6 sm:max-w-[480px]')}
+          className={cn(modalGlass, 'w-[480px] gap-0 p-6 sm:max-w-[480px]')}
           showCloseButton={false}
         >
           {body}
@@ -142,7 +142,10 @@ function EditBody({
       await updateTransaction(transaction.id, {
         amountVnd: parsedAmount,
         categoryId,
-        note: note.trim() || undefined,
+        // `null` chứ KHÔNG phải undefined khi xoá trắng tên: updateTransactionRow
+        // bỏ qua mọi trường undefined (coi là "không đổi"), nên gửi undefined thì
+        // tên cũ ở lại và thao tác xoá tên im lặng không có tác dụng.
+        note: note.trim() || null,
         occurredAt: new Date(occurredAt).toISOString(),
       })
     } catch {
@@ -170,8 +173,10 @@ function EditBody({
 
   return (
     <>
-      {/* Đầu tấm: Huỷ | Sửa giao dịch | Lưu */}
-      <div className="flex items-center justify-between gap-3">
+      {/* Đầu tấm: Huỷ | Sửa giao dịch | Lưu — neo ngoài vùng cuộn, vì đây là
+          hai lối thoát duy nhất của tấm; để nó trôi đi mất thì người dùng phải
+          cuộn ngược lên mới huỷ hay lưu được. */}
+      <div className={cn('flex items-center justify-between gap-3', wide && 'pb-4')}>
         <button
           type="button"
           onClick={onClose}
@@ -193,138 +198,147 @@ function EditBody({
         </button>
       </div>
 
-      {/* Số tiền: thẻ đọc, bấm "Sửa" mới bật bàn phím số */}
-      {editingAmount ? (
-        <AmountInput
-          value={amountRaw}
-          onChange={setAmountRaw}
-          mode={wide ? 'input' : 'display'}
-        />
-      ) : (
-        <div className={cn(readCard, 'flex items-center justify-between gap-3')}>
-          <div className="flex min-w-0 flex-col gap-1">
-            <span className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
-              Số tiền
-            </span>
-            <span className="text-[38px] leading-none font-semibold tabular-nums">
-              {formatVnd(parsedAmount ?? transaction.amountVnd)}
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setEditingAmount(true)}
-            className="shrink-0 text-[15px] font-semibold text-accent"
-          >
-            Sửa
-          </button>
-        </div>
-      )}
-
-      {editingAmount && !wide && (
-        <Numpad
-          value={amountRaw}
-          onChange={setAmountRaw}
-          onSubmit={() => setEditingAmount(false)}
-          canSubmit={Boolean(parsedAmount)}
-        />
-      )}
-
-      {/* Danh mục — nguồn tiền đã gỡ bỏ, xem types/transaction.ts */}
-      <div>
-        <div className={cn(readCard, 'flex flex-col gap-1.5')}>
-          <span className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
-            Danh mục
-          </span>
-          <Select
-            items={Object.fromEntries(options.map((c) => [c.id, c.label]))}
-            value={categoryId}
-            onValueChange={(v) => setCategoryId(String(v ?? ''))}
-          >
-            <SelectTrigger
-              size="none"
-              className="w-full border-0 bg-transparent p-0 text-[15px] font-medium"
-            >
-              <span className="flex min-w-0 items-center gap-2">
-                <span
-                  className="size-2.5 shrink-0"
-                  style={{ background: lookup(categoryId).color }}
-                  aria-hidden
-                />
-                <SelectValue />
+      <div
+        className={cn(
+          'flex flex-col gap-4',
+          // Chỉ bản desktop cần vùng cuộn riêng: bản mobile là Sheet, SheetContent
+          // đã tự cuộn cả tấm rồi.
+          wide && 'no-scrollbar min-h-0 overflow-y-auto overscroll-contain',
+        )}
+      >
+        {/* Số tiền: thẻ đọc, bấm "Sửa" mới bật bàn phím số */}
+        {editingAmount ? (
+          <AmountInput
+            value={amountRaw}
+            onChange={setAmountRaw}
+            mode={wide ? 'input' : 'display'}
+          />
+        ) : (
+          <div className={cn(readCard, 'flex items-center justify-between gap-3')}>
+            <div className="flex min-w-0 flex-col gap-1">
+              <span className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
+                Số tiền
               </span>
-            </SelectTrigger>
-            <SelectContent>
-              {options.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-      </div>
-
-      <input
-        type="text"
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        placeholder="Tên giao dịch"
-        aria-label="Tên giao dịch"
-        className={fieldBox}
-      />
-      <input
-        type="datetime-local"
-        value={occurredAt}
-        onChange={(e) => setOccurredAt(e.target.value)}
-        aria-label="Thời điểm"
-        className={fieldBox}
-      />
-
-      <p className="font-mono text-[11px] text-muted">
-        {formatStamp(transaction.createdAt)}
-      </p>
-
-      {status === 'error' && <SaveError onRetry={() => setStatus('idle')} />}
-
-      {/* Xoá — cuối vùng cuộn, không nằm trong vùng neo đáy */}
-      {confirmingDelete ? (
-        <div className="border-2 border-negative bg-negative/12 p-4">
-          <p className="text-[19px] font-semibold text-pretty">
-            Xoá “{transaction.note ?? lookup(transaction.categoryId).label}”?
-          </p>
-          <p className="mt-1.5 text-[15px] text-muted text-pretty">
-            {formatVnd(transaction.amountVnd)} sẽ bị gỡ khỏi mọi con số và báo cáo.{' '}
-            <span className="font-semibold text-foreground">Không hoàn tác được.</span>
-          </p>
-          <div className="mt-3 flex gap-2.5">
-            <motion.button
-              type="button"
-              whileTap={{ scale: 0.98 }}
-              onClick={remove}
-              disabled={saving}
-              className="h-[52px] flex-1 bg-negative text-[15px] font-semibold text-negative-foreground transition-[filter] duration-[120ms] hover:brightness-[1.06] active:brightness-90 disabled:opacity-60"
-            >
-              {saving ? 'Đang xoá…' : 'Xoá'}
-            </motion.button>
+              <span className="text-[38px] leading-none font-semibold tabular-nums">
+                {formatVnd(parsedAmount ?? transaction.amountVnd)}
+              </span>
+            </div>
             <button
               type="button"
-              onClick={() => setConfirmingDelete(false)}
-              className="h-[52px] flex-1 bg-men-phim text-[15px] font-medium transition-colors duration-[120ms] hover:brightness-110"
+              onClick={() => setEditingAmount(true)}
+              className="shrink-0 text-[15px] font-semibold text-accent"
             >
-              Giữ lại
+              Sửa
             </button>
           </div>
+        )}
+
+        {editingAmount && !wide && (
+          <Numpad
+            value={amountRaw}
+            onChange={setAmountRaw}
+            onSubmit={() => setEditingAmount(false)}
+            canSubmit={Boolean(parsedAmount)}
+          />
+        )}
+
+        {/* Danh mục — nguồn tiền đã gỡ bỏ, xem types/transaction.ts */}
+        <div>
+          <div className={cn(readCard, 'flex flex-col gap-1.5')}>
+            <span className="font-mono text-[11px] font-medium tracking-[.2em] text-muted uppercase">
+              Danh mục
+            </span>
+            <Select
+              items={Object.fromEntries(options.map((c) => [c.id, c.label]))}
+              value={categoryId}
+              onValueChange={(v) => setCategoryId(String(v ?? ''))}
+            >
+              <SelectTrigger
+                size="none"
+                className="w-full border-0 bg-transparent p-0 text-[15px] font-medium"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <span
+                    className="size-2.5 shrink-0"
+                    style={{ background: lookup(categoryId).color }}
+                    aria-hidden
+                  />
+                  <SelectValue />
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                {options.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
         </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setConfirmingDelete(true)}
-          className="h-[52px] w-full border-2 border-negative text-[15px] font-medium text-negative transition-colors duration-[120ms] hover:bg-negative/12"
-        >
-          Xoá giao dịch
-        </button>
-      )}
+
+        <input
+          type="text"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Tên giao dịch"
+          aria-label="Tên giao dịch"
+          className={fieldBox}
+        />
+        <input
+          type="datetime-local"
+          value={occurredAt}
+          onChange={(e) => setOccurredAt(e.target.value)}
+          aria-label="Thời điểm"
+          className={fieldBox}
+        />
+
+        <p className="font-mono text-[11px] text-muted">
+          {formatStamp(transaction.createdAt)}
+        </p>
+
+        {status === 'error' && <SaveError onRetry={() => setStatus('idle')} />}
+
+        {/* Xoá — cuối vùng cuộn, không nằm trong vùng neo đáy */}
+        {confirmingDelete ? (
+          <div className="border-2 border-negative bg-negative/12 p-4">
+            <p className="text-[19px] font-semibold text-pretty">
+              Xoá “{transaction.note ?? lookup(transaction.categoryId).label}”?
+            </p>
+            <p className="mt-1.5 text-[15px] text-muted text-pretty">
+              {formatVnd(transaction.amountVnd)} sẽ bị gỡ khỏi mọi con số và báo cáo.{' '}
+              <span className="font-semibold text-foreground">Không hoàn tác được.</span>
+            </p>
+            <div className="mt-3 flex gap-2.5">
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.98 }}
+                onClick={remove}
+                disabled={saving}
+                className="h-[52px] flex-1 bg-negative text-[15px] font-semibold text-negative-foreground transition-[filter] duration-[120ms] hover:brightness-[1.06] active:brightness-90 disabled:opacity-60"
+              >
+                {saving ? 'Đang xoá…' : 'Xoá'}
+              </motion.button>
+              <button
+                type="button"
+                onClick={() => setConfirmingDelete(false)}
+                className="h-[52px] flex-1 bg-men-phim text-[15px] font-medium transition-colors duration-[120ms] hover:brightness-110"
+              >
+                Giữ lại
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setConfirmingDelete(true)}
+            className="h-[52px] w-full border-2 border-negative text-[15px] font-medium text-negative transition-colors duration-[120ms] hover:bg-negative/12"
+          >
+            Xoá giao dịch
+          </button>
+        )}
+      </div>
     </>
   )
 }
