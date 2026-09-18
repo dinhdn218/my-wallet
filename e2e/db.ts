@@ -53,7 +53,7 @@ export async function ensureTestUser(email: string): Promise<string> {
 }
 
 /**
- * Dọn sạch dữ liệu của một tài khoản, chỉ để lại 8 danh mục mặc định.
+ * Dọn sạch dữ liệu của một tài khoản, chỉ để lại các danh mục mặc định.
  * Dùng cho test di trú: hộp thoại mời chuyển chỉ hiện khi server chưa có giao
  * dịch nào.
  */

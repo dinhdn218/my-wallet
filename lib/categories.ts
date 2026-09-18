@@ -33,6 +33,15 @@ export const UNG_NHOM_CATEGORY: Category = {
 /** Danh mục hệ thống — không xoá, không đổi tên được ở màn Danh mục. */
 export const laDanhMucHeThong = (id: CategoryId) => id === UNG_NHOM_ID
 
+/**
+ * ⚠️ Thứ tự ở đây LÀ `sort_order` trong Postgres, tức thứ tự hiển thị ở màn
+ * Danh mục và ở ô chọn lúc sửa. Đổi thứ tự thì phải đổi cả `handle_new_user()`
+ * trong supabase/schema.sql — lib/categories-schema.test.ts canh chỗ đó.
+ *
+ * Màu của bốn mục cuối không lấy từ CHART_COLORS: bảng chỉ có 6 màu mà 8 danh
+ * mục cũ đã dùng gần hết, nên chúng lấy các vùng màu còn trống (lá, tím, lam)
+ * để lát cắt biểu đồ không dính vào nhau.
+ */
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'an-uong', label: 'Ăn uống', color: '#3ED6B5' },
   { id: 'nhau', label: 'Nhậu', color: 'oklch(.78 .13 265)' },
@@ -41,6 +50,11 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'nha-cua', label: 'Nhà cửa', color: '#F5AC3C' },
   { id: 'mua-sam', label: 'Mua sắm', color: 'oklch(.78 .13 220)' },
   { id: 'luong', label: 'Lương', color: '#3ED6B5' },
+  { id: 'tin-dung', label: 'Tín dụng', color: 'var(--c1)' },
+  { id: 'cau-long', label: 'Cầu lông', color: 'oklch(.76 .14 145)' },
+  { id: 'hieu-hi', label: 'Hiếu hỉ', color: 'oklch(.78 .13 295)' },
+  { id: 'freelance', label: 'Freelance', color: 'oklch(.78 .13 195)' },
+  // Luôn đứng cuối: đây là chỗ đổ của mọi thứ chưa phân loại.
   { id: 'khac', label: 'Khác', color: 'rgba(246,241,233,.28)' },
 ]
 
@@ -71,6 +85,11 @@ export const CHART_COLORS = [
  * một khoản chi — nó chỉ sinh ra từ nút "Chia tiền", kèm theo phần mình thật
  * sự tiêu. Bày nó ra dải thẻ giá sẽ mời người dùng ghi 500k tiền ứng mà không
  * ghi 100k phần của mình, đúng cái sai mà tính năng này sinh ra để tránh.
+ *
+ * Thứ tự ở đây LÀ thứ tự thẻ trên dải cuộn ngang (khác thứ tự
+ * DEFAULT_CATEGORIES, vốn là thứ tự màn Danh mục). Xếp theo tần suất GHI, không
+ * theo số tiền: thẻ càng hay bấm càng phải gần mép trái, vì dải này được dùng
+ * bằng một tay khi đang đứng ở quán.
  */
 export const EXPENSE_CATEGORY_IDS: CategoryId[] = [
   'an-uong',
@@ -79,6 +98,9 @@ export const EXPENSE_CATEGORY_IDS: CategoryId[] = [
   'mua-sam',
   'cafe',
   'nhau',
+  'cau-long',
+  'tin-dung',
+  'hieu-hi',
   'khac',
 ]
 
@@ -86,7 +108,12 @@ export const EXPENSE_CATEGORY_IDS: CategoryId[] = [
  * UNG_NHOM_ID CÓ ở đây: đòi được tiền là ghi một khoản Thu vào danh mục này,
  * và đó là cách duy nhất để sổ nợ trừ dần về 0.
  */
-export const INCOME_CATEGORY_IDS: CategoryId[] = [UNG_NHOM_ID, 'luong', 'khac']
+export const INCOME_CATEGORY_IDS: CategoryId[] = [
+  UNG_NHOM_ID,
+  'luong',
+  'freelance',
+  'khac',
+]
 
 /**
  * Danh mục chọn được khi SỬA một giao dịch đã có.

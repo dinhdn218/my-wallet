@@ -201,7 +201,7 @@ create policy "balance_marks: delete own" on public.balance_marks
 
 
 -- ===========================================================================
--- Tài khoản mới → seed 8 danh mục mặc định
+-- Tài khoản mới → seed 12 danh mục mặc định
 --
 -- Giữ khớp với DEFAULT_CATEGORIES trong lib/categories.ts (kể cả thứ tự).
 --
@@ -225,7 +225,11 @@ begin
     (new.id, 'nha-cua', 'Nhà cửa', '#F5AC3C',              4),
     (new.id, 'mua-sam', 'Mua sắm', 'oklch(.78 .13 220)',   5),
     (new.id, 'luong',   'Lương',   '#3ED6B5',              6),
-    (new.id, 'khac',    'Khác',    'rgba(246,241,233,.28)', 7);
+    (new.id, 'tin-dung', 'Tín dụng', 'var(--c1)',           7),
+    (new.id, 'cau-long', 'Cầu lông', 'oklch(.76 .14 145)',  8),
+    (new.id, 'hieu-hi',  'Hiếu hỉ',  'oklch(.78 .13 295)',  9),
+    (new.id, 'freelance', 'Freelance', 'oklch(.78 .13 195)', 10),
+    (new.id, 'khac',    'Khác',    'rgba(246,241,233,.28)', 11);
   return new;
 end;
 $$;
