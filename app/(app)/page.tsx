@@ -50,10 +50,21 @@ export default function TrangChinh() {
   return (
     <main className="flex min-h-0 flex-1 flex-col md:flex-row">
       {/* ---------- Cột ghi: trái ở desktop, dưới ở mobile ---------- */}
-      <div className="no-scrollbar mep-men order-2 flex shrink-0 flex-col overflow-y-auto bg-men-dam px-4 pt-3 pb-3 md:order-1 md:h-dvh md:w-[360px] md:overflow-y-auto md:px-7 md:py-6 xl:w-[400px] xl:px-8">
+      {/*
+        ⚠️ Cột này KHÔNG cuộn (`overflow-hidden`), chỉ khối ghi bên trong mới
+        cuộn. Trước đây cả cột cuộn, nên mở dải chia tiền là thương hiệu và
+        con số "còn tiêu được" bị kéo lên trên mép màn — hai thứ phải luôn
+        nhìn thấy, vì con số đó là câu trả lời của cả màn hình.
+        `max-h-[70dvh]` ở mobile giữ cột ghi không ăn hết chỗ của bảng giá
+        phía trên khi nó nở ra.
+      */}
+      <div className="mep-men order-2 flex max-h-[70dvh] min-h-0 shrink flex-col overflow-hidden bg-men-dam px-4 pt-3 pb-3 md:order-1 md:h-dvh md:max-h-none md:w-[360px] md:shrink-0 md:px-7 md:py-6 xl:w-[400px] xl:px-8">
         <Brand className="hidden shrink-0 md:flex" />
         <ConTieuDuoc pending={pending} className="mt-[clamp(14px,3vh,28px)] hidden shrink-0 md:flex" />
-        <GhiNhanh onPendingChange={setPending} className="md:mt-[clamp(12px,2.2vh,24px)] md:min-h-0 md:flex-1" />
+        <GhiNhanh
+          onPendingChange={setPending}
+          className="min-h-0 flex-1 md:mt-[clamp(12px,2.2vh,24px)]"
+        />
 
         <div className="mt-[clamp(8px,1.5vh,16px)] hidden shrink-0 flex-col md:flex">
           <ThemeToggle size="desktop" />

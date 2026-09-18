@@ -42,6 +42,7 @@ export function BanPhimSo({
   value,
   onChange,
   focusRef,
+  thap,
   className,
   children,
 }: {
@@ -53,6 +54,13 @@ export function BanPhimSo({
    * phải dùng chung một điểm focus.
    */
   focusRef?: React.RefObject<HTMLInputElement | null>
+  /**
+   * Hạ chiều cao phím khi cột ghi đang phải chứa thêm thứ khác (dải chia
+   * tiền). Phím vẫn giữ 44px — ngưỡng vùng chạm tối thiểu, không xuống thấp
+   * hơn — chỉ bỏ phần nở thêm trên màn cao, để nút GHI không bị đẩy khỏi tầm
+   * ngón cái. Xem PRODUCT.md § Accessibility.
+   */
+  thap?: boolean
   className?: string
   /** Ô thứ 16 của lưới — thường là nút đổi Thu/Chi. */
   children?: React.ReactNode
@@ -91,7 +99,8 @@ export function BanPhimSo({
                 : undefined
           }
           className={cn(
-            'flex h-[clamp(44px,6.2vh,58px)] items-center justify-center bg-men-phim',
+            'flex items-center justify-center bg-men-phim',
+            thap ? 'h-[clamp(44px,5vh,48px)]' : 'h-[clamp(44px,6.2vh,58px)]',
             'transition-[filter] duration-[120ms] hover:brightness-110 active:brightness-95',
             phim.loai === 'donvi'
               ? 'text-[19px] font-semibold text-accent'

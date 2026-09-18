@@ -40,6 +40,8 @@ lại là không quảng cáo, không gói trả phí, không tính năng thừa
 - Đăng nhập bằng magic link qua email (không mật khẩu). Đổi máy thì đăng nhập lại.
 - Dữ liệu ở Supabase (Postgres), có RLS theo user.
 - Mọi số liệu gom theo **tháng**; `activeMonth` là bộ lọc dùng chung cho mọi màn.
+  Ngoại lệ duy nhất: "Đang cho mượn" cộng dồn MỌI tháng — khoản ứng tháng trước
+  chưa đòi vẫn là tiền đang thiếu của tháng này.
 - Số tiền nhập theo lối nói tiếng Việt: `300k`, `1.5tr` — không gõ đủ số 0.
 - Múi giờ UTC+7; gom tháng theo giờ địa phương, không cắt chuỗi ISO.
 
@@ -56,6 +58,12 @@ lại là không quảng cáo, không gói trả phí, không tính năng thừa
 - **Số dư thật**, suy ra từ "mốc số dư" người dùng tự đặt (một con số gộp mọi
   ví/ngân hàng/tiền mặt). Đặt mốc mới = đối soát, và app chỉ ra phần lệch giữa
   sổ và đời thực để người dùng biết mình đã quên ghi khoảng bao nhiêu.
+- **Chia tiền nhóm**: ứng tiền cho cả nhóm được ghi thành HAI giao dịch — phần
+  mình thật sự tiêu (vào danh mục đã chọn) và phần ứng cho người khác (vào danh
+  mục hệ thống "Ứng cho nhóm"). Phần ứng KHÔNG tính là chi tiêu: không vào "đã
+  tiêu tháng này", không vào biểu đồ chia theo danh mục, không đốt hạn mức —
+  nhưng vẫn trừ số dư, vì tiền đã thật sự rời ví. Đòi về thì ghi một khoản Thu
+  vào chính danh mục đó.
 
 **Bỏ trong bản thiết kế lại:**
 - **Nguồn tiền (Techcombank / Tiền mặt / Ví Momo) bị gỡ bỏ.** Không có số dư đầu

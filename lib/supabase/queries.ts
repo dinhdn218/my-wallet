@@ -129,6 +129,36 @@ export async function deleteTransaction(supabase: SupabaseClient, id: string) {
   if (error) throw error
 }
 
+/**
+ * Tạo một danh mục nếu nó chưa có, không đụng tới danh mục đã tồn tại.
+ *
+ * ⚠️ `ignoreDuplicates: true` là điểm mấu chốt, không phải tinh chỉnh: hàm này
+ * dùng để dựng danh mục HỆ THỐNG ("Ứng cho nhóm") ngay trước khi ghi giao dịch
+ * đầu tiên vào nó. Một upsert thường sẽ ghi đè nhãn và màu mỗi lần chia tiền —
+ * cuốn phăng mọi thay đổi người dùng từng làm, âm thầm, mỗi lần đi ăn nhóm.
+ *
+ * sort_order để cuối danh sách: đây không phải danh mục người dùng chọn hằng
+ * ngày, nó không nên chen lên trước Ăn uống ở màn Danh mục.
+ */
+export async function insertCategoryIfMissing(
+  supabase: SupabaseClient,
+  userId: string,
+  category: Category,
+  sortOrder = 100,
+) {
+  const { error } = await supabase.from('categories').upsert(
+    {
+      user_id: userId,
+      id: category.id,
+      label: category.label,
+      color: category.color,
+      sort_order: sortOrder,
+    },
+    { onConflict: 'user_id,id', ignoreDuplicates: true },
+  )
+  if (error) throw error
+}
+
 export async function updateCategoryRow(
   supabase: SupabaseClient,
   id: CategoryId,
