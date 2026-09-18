@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { CotTrai } from '@/components/layout/cot-trai'
 import { PageHeader } from '@/components/layout/page-header'
 import { AmountSkeleton } from '@/components/ui/glass-card'
-import { CHART_COLORS } from '@/lib/categories'
+import { CHART_COLORS, laDanhMucHeThong } from '@/lib/categories'
 import { formatVnd } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import {
@@ -113,7 +113,10 @@ function CategoryRow({
   const removeCategory = useExpenseStore((s) => s.removeCategory)
   const [failed, setFailed] = useState(false)
   const [busy, setBusy] = useState(false)
-  const deletable = count === 0
+  // Danh mục hệ thống ("Ứng cho nhóm") không xoá và không đổi tên được: cả
+  // việc chia tiền lẫn con số "đang cho mượn" đều tìm theo đúng id của nó.
+  const heThong = laDanhMucHeThong(id)
+  const deletable = count === 0 && !heThong
 
   async function remove() {
     setBusy(true)
@@ -150,13 +153,15 @@ function CategoryRow({
         </span>
 
         <span className="flex w-20 shrink-0 justify-end gap-3 md:w-24">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="text-[15px] font-semibold text-accent"
-          >
-            Sửa
-          </button>
+          {!heThong && (
+            <button
+              type="button"
+              onClick={onEdit}
+              className="text-[15px] font-semibold text-accent"
+            >
+              Sửa
+            </button>
+          )}
           <button
             type="button"
             onClick={remove}
@@ -178,11 +183,18 @@ function CategoryRow({
       )}
 
       {/* Nói thẳng lý do ngay dưới, không ẩn nút. */}
-      {!deletable && (
+      {heThong ? (
         <p className="mt-1.5 text-[15px] text-muted text-pretty">
-          Chưa xoá được — còn {count} giao dịch. Chuyển chúng sang danh mục khác trước
-          rồi mới xoá được.
+          Danh mục của app — tiền bạn ứng cho người khác nằm ở đây, và nó không
+          tính vào chi tiêu. Không sửa hay xoá được.
         </p>
+      ) : (
+        !deletable && (
+          <p className="mt-1.5 text-[15px] text-muted text-pretty">
+            Chưa xoá được — còn {count} giao dịch. Chuyển chúng sang danh mục khác
+            trước rồi mới xoá được.
+          </p>
+        )
       )}
     </div>
   )

@@ -70,7 +70,12 @@ export default function TransactionsPage() {
     <div className="flex min-h-0 flex-1 md:flex-row">
       <CotTrai />
 
-      <main className="no-scrollbar flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-4 pt-4 pb-4 md:px-8 md:pt-8 md:pb-8">
+      {/*
+        Vùng cuộn nằm ở BẢNG bên dưới chứ không ở `main`: tiêu đề, dải lọc và
+        dòng kết sổ "Chi tháng" phải đứng yên khi lướt danh sách. Cùng mô hình
+        với màn chính — xem app/(app)/page.tsx.
+      */}
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-4 pt-4 pb-4 md:px-8 md:pt-8 md:pb-8">
         <PageHeader
           title="Giao dịch"
           meta={
@@ -127,7 +132,15 @@ export default function TransactionsPage() {
 
         <div className="mt-5 h-px bg-men-vien" />
 
-        <div data-testid="tx-table" className="mt-2 flex min-h-0 flex-1 flex-col">
+        {/*
+          Đây là vùng cuộn duy nhất của trang. `min-h-0` là bắt buộc: thiếu nó
+          thì flex item không co dưới chiều cao nội dung, bảng phình ra đẩy dòng
+          kết sổ khỏi màn hình thay vì tự cuộn bên trong.
+        */}
+        <div
+          data-testid="tx-table"
+          className="no-scrollbar mt-2 flex min-h-0 flex-1 flex-col overflow-y-auto"
+        >
           {!hasHydrated ? (
             <div className="flex flex-col gap-3 pt-3">
               {[0, 1, 2, 3, 4].map((i) => (

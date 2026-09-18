@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
+import { DangChoMuon } from '@/components/balance/dang-cho-muon'
 import { SoDuCard } from '@/components/balance/so-du-card'
 import { CotTrai } from '@/components/layout/cot-trai'
 import { PageHeader } from '@/components/layout/page-header'
@@ -78,6 +79,9 @@ export default function ReportPage() {
       </PageHeader>
 
       <SoDuCard className="mt-6" />
+
+      {/* Ẩn hoàn toàn khi chưa từng ứng lần nào — xem DangChoMuon. */}
+      <DangChoMuon className="mt-8" />
 
       {/* Thu & chi theo tháng */}
       <section className="mt-8 flex flex-col">

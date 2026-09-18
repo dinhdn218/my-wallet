@@ -37,6 +37,7 @@ export const queryMocks = {
     ...patch,
   })),
   deleteTransaction: vi.fn(async () => {}),
+  insertCategoryIfMissing: vi.fn(async () => {}),
   updateCategoryRow: vi.fn(async () => {}),
   deleteCategory: vi.fn(async () => {}),
   upsertBudget: vi.fn(async () => {}),

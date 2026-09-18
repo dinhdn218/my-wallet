@@ -215,12 +215,21 @@ body {
  * hạt men lấm tấm. Đây là VẬT LIỆU của thế giới, không phải halo trang trí —
  * xem khối OWN-WORLD trong .impeccable/surfaces/.
  */
-.men-mat {
-  background:
-    radial-gradient(120% 90% at 18% 4%, color-mix(in oklab, var(--men) 84%, white) 0%, transparent 58%),
-    radial-gradient(90% 70% at 86% 92%, color-mix(in oklab, var(--men) 88%, black) 0%, transparent 60%),
-    var(--men);
-  position: relative;
+/*
+ * Nằm trong @layer components, KHÔNG để trần: Tailwind v4 xếp utility trong
+ * @layer utilities, mà CSS không-layer thắng mọi layer bất kể đặc hiệu. Để trần
+ * thì `position: relative` dưới đây đè cả `fixed` của tấm dialog — modal canh
+ * theo phần tử cha thay vì khung nhìn và tụt hẳn ra ngoài đáy màn hình.
+ * `relative` ở đây chỉ để neo ::before/::after, nên phải nhường utility.
+ */
+@layer components {
+  .men-mat {
+    background:
+      radial-gradient(120% 90% at 18% 4%, color-mix(in oklab, var(--men) 84%, white) 0%, transparent 58%),
+      radial-gradient(90% 70% at 86% 92%, color-mix(in oklab, var(--men) 88%, black) 0%, transparent 60%),
+      var(--men);
+    position: relative;
+  }
 }
 
 /*

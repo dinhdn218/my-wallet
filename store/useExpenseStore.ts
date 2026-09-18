@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { categoryOf } from '@/lib/categories'
+import { UNG_NHOM_CATEGORY, UNG_NHOM_ID, categoryOf } from '@/lib/categories'
 import type { Category, CategoryId } from '@/lib/categories'
 import { daysLeftInMonth } from '@/lib/format'
 import { SEED_ACTIVE_MONTH } from '@/lib/seed-data'
@@ -16,6 +16,7 @@ import {
   deleteCategory,
   deleteTransaction,
   fetchSnapshot,
+  insertCategoryIfMissing,
   insertTransaction,
   updateCategoryRow,
   updateTransactionRow,
@@ -23,7 +24,12 @@ import {
   upsertBudget,
 } from '@/lib/supabase/queries'
 import type { BalanceMark } from '@/types/balance'
-import type { NewTransaction, Transaction, TxType } from '@/types/transaction'
+import type {
+  NewTransaction,
+  Transaction,
+  TransactionPatch,
+  TxType,
+} from '@/types/transaction'
 
 export type { NewTransaction, Transaction, TxType }
 export type { BalanceMark }
@@ -38,6 +44,45 @@ export type { Budgets }
 export type RemoveCategoryResult =
   | { ok: true }
   | { ok: false; reason: 'in-use' | 'network' }
+
+/** Một lần ứng tiền cho nhóm, trước khi tách thành hai giao dịch. */
+export interface SplitInput {
+  /** TỔNG hoá đơn, tức số tiền thật sự rời khỏi ví. */
+  amountVnd: number
+  /** Tổng số người cùng chia, KỂ CẢ mình. Phải >= 2. */
+  soNguoi: number
+  /** Danh mục của phần mình tiêu ("an-uong"…), không phải danh mục ứng. */
+  categoryId: CategoryId
+  note?: string
+  occurredAt: string
+}
+
+export interface SplitParts {
+  /** Phần mình thật sự tiêu — vào danh mục đã chọn, tính là chi tiêu. */
+  cuaMinh: number
+  /** Phần ứng cho người khác — vào danh mục hệ thống, KHÔNG tính là chi. */
+  ungRa: number
+}
+
+/**
+ * Chia hoá đơn thành phần của mình và phần ứng ra.
+ *
+ * ⚠️ Phần LẺ rơi vào phần của mình, không phải phần ứng ra. Chia 500k cho 3
+ * thì mình chịu 166.668đ còn hai người kia nợ đúng 166.666đ mỗi người. Lý do:
+ * số nợ phải là con số đòi được — nói với bạn mình "đưa tao 166.666" thì được,
+ * chứ sổ nợ mang số lẻ mà người ta trả số chẵn sẽ để lại vài đồng rác vĩnh
+ * viễn trong "đang cho mượn". Mình chịu phần lẻ là cách duy nhất khiến sổ về
+ * đúng 0 khi mọi người đã trả đủ.
+ *
+ * Hệ quả bắt buộc: cuaMinh + ungRa === amountVnd, LUÔN LUÔN. Bất biến này là
+ * thứ giữ cho số dư khớp đời thực — vi phạm nó thì mỗi lần chia tiền lại làm
+ * số dư lệch vài đồng, không bao giờ tự sửa.
+ */
+export function chiaHoaDon(amountVnd: number, soNguoi: number): SplitParts {
+  const moiNguoi = Math.floor(amountVnd / soNguoi)
+  const ungRa = moiNguoi * (soNguoi - 1)
+  return { cuaMinh: amountVnd - ungRa, ungRa }
+}
 
 /** Trạng thái đồng bộ với server. Chỉ dùng cho chỉ báo, không chặn nội dung. */
 export type SyncStatus = 'idle' | 'loading' | 'ready' | 'error'
@@ -72,7 +117,12 @@ interface ExpenseState {
   signOutAndClear: () => void
 
   addTransaction: (input: NewTransaction) => Promise<string>
-  updateTransaction: (id: string, patch: Partial<NewTransaction>) => Promise<void>
+  /**
+   * Ứng tiền cho nhóm: ghi PHẦN MÌNH TIÊU vào danh mục đã chọn, và PHẦN ỨNG
+   * RA cho người khác vào danh mục hệ thống "Ứng cho nhóm". Xem SplitInput.
+   */
+  addSplitTransaction: (input: SplitInput) => Promise<void>
+  updateTransaction: (id: string, patch: TransactionPatch) => Promise<void>
   removeTransaction: (id: string) => Promise<void>
   setActiveMonth: (month: string) => void
   setHasHydrated: (value: boolean) => void
@@ -104,6 +154,19 @@ const monthKey = (iso: string) => {
   const d = new Date(iso)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
+
+/**
+ * Khoản này có phải TIỀN ỨNG cho người khác không (cả lúc ứng ra lẫn lúc đòi về).
+ *
+ * ⚠️ Mọi phép tính CHI TIÊU phải loại nó ra: tiền ứng rời ví thật nhưng không
+ * phải mình tiêu, nên tính vào "đã tiêu" sẽ thổi phồng báo cáo và đốt oan hạn
+ * mức. Ngược lại, mọi phép tính SỐ DƯ phải GIỮ nó lại — tiền đã thật sự ra
+ * khỏi ví, bỏ qua thì số dư suy ra không còn khớp đời thực.
+ *
+ * Ranh giới đó là lý do hàm này tồn tại thay vì lọc rải rác: xem
+ * computeMonthlySummary (loại), computeCurrentBalance (giữ).
+ */
+export const laUngNhom = (t: Transaction) => t.categoryId === UNG_NHOM_ID
 
 /** Mã lỗi Postgres đi kèm trong lỗi của supabase-js. */
 const errorCode = (error: unknown): string | undefined =>
@@ -180,6 +243,75 @@ export const useExpenseStore = create<ExpenseState>()(
         const tx = await insertTransaction(createClient(), userId, input)
         set((s) => ({ transactions: [tx, ...s.transactions] }))
         return tx.id
+      },
+
+      /**
+       * Ứng tiền cho nhóm = HAI giao dịch, không phải một khoản chi lớn:
+       *   1. phần mình tiêu  -> danh mục đã chọn, tính là chi tiêu
+       *   2. phần ứng ra     -> danh mục hệ thống, KHÔNG tính là chi tiêu
+       *
+       * Tổng hai khoản đúng bằng hoá đơn, nên số dư vẫn giảm đủ và khớp ví
+       * thật; chỉ riêng con số "đã tiêu" là loại phần ứng ra.
+       *
+       * ⚠️ Nếu khoản thứ hai ghi hỏng, khoản thứ nhất PHẢI bị gỡ. Postgres
+       * không có transaction xuyên hai lần gọi REST, nên phải tự dọn ở đây —
+       * để lại một nửa nghĩa là người dùng thấy 100k tiền lẩu và không thấy
+       * 400k đã ứng, tức là mất tiền trong sổ mà không có dấu vết gì.
+       */
+      addSplitTransaction: async ({
+        amountVnd,
+        soNguoi,
+        categoryId,
+        note,
+        occurredAt,
+      }) => {
+        const userId = get().userId
+        if (!userId) throw new Error('Chưa đăng nhập')
+        if (soNguoi < 2) throw new Error('Chia tiền cần ít nhất 2 người')
+
+        const { cuaMinh, ungRa } = chiaHoaDon(amountVnd, soNguoi)
+        const supabase = createClient()
+
+        // Danh mục hệ thống phải tồn tại TRƯỚC khi ghi: transactions có khoá
+        // ngoại trỏ tới categories, thiếu nó thì khoản thứ hai văng 23503.
+        await insertCategoryIfMissing(supabase, userId, UNG_NHOM_CATEGORY)
+        if (!get().categories.some((c) => c.id === UNG_NHOM_ID)) {
+          set((s) => ({ categories: [...s.categories, UNG_NHOM_CATEGORY] }))
+        }
+
+        const phanMinh = await insertTransaction(supabase, userId, {
+          type: 'expense',
+          amountVnd: cuaMinh,
+          categoryId,
+          note,
+          occurredAt,
+        })
+
+        let phanUng: Transaction
+        try {
+          phanUng = await insertTransaction(supabase, userId, {
+            type: 'expense',
+            amountVnd: ungRa,
+            categoryId: UNG_NHOM_ID,
+            // Ghi luôn số người vào ghi chú: nhìn lại sau một tháng, "ứng
+            // 400k" không nói được đã ứng cho mấy người, mà đó là thứ cần để
+            // đối chiếu khi đòi.
+            note: note ? `${note} · ứng ${soNguoi - 1} người` : `Ứng ${soNguoi - 1} người`,
+            occurredAt,
+          })
+        } catch (error) {
+          // Dọn khoản đã ghi để sổ không bị lệch một nửa. Dọn hỏng nữa thì
+          // đành chịu — vẫn ném lỗi gốc để người dùng biết mà kiểm tra lại.
+          try {
+            await deleteTransaction(supabase, phanMinh.id)
+          } catch {
+            // Không nuốt im: khoản mồ côi sẽ hiện ở danh sách giao dịch, và
+            // người dùng vừa thấy báo lỗi nên biết phải xem lại.
+          }
+          throw error
+        }
+
+        set((s) => ({ transactions: [phanUng, phanMinh, ...s.transactions] }))
       },
 
       updateTransaction: async (id, patch) => {
@@ -337,7 +469,12 @@ export function computeMonthlySummary(
   transactions: Transaction[],
   month: string,
 ): MonthlySummary {
-  const rows = transactions.filter((t) => monthKey(t.occurredAt) === month)
+  // Tiền ứng cho nhóm bị loại khỏi CẢ thu lẫn chi: ứng ra không phải mình
+  // tiêu, và đòi về không phải mình kiếm được. Để lọt vào thu nhập thì
+  // savingRate sẽ nhảy vô nghĩa mỗi lần đòi được nợ.
+  const rows = transactions.filter(
+    (t) => monthKey(t.occurredAt) === month && !laUngNhom(t),
+  )
   const income = rows
     .filter((t) => t.type === 'income')
     .reduce((a, t) => a + t.amountVnd, 0)
@@ -494,8 +631,10 @@ export function computeExpenseByCategory(
   transactions: Transaction[],
   month: string,
 ): CategorySlice[] {
+  // Loại tiền ứng: biểu đồ này trả lời "tiêu vào đâu", mà tiền ứng thì chưa
+  // tiêu vào đâu cả — nó đang nằm ở túi người khác.
   const rows = transactions.filter(
-    (t) => monthKey(t.occurredAt) === month && t.type === 'expense',
+    (t) => monthKey(t.occurredAt) === month && t.type === 'expense' && !laUngNhom(t),
   )
   const total = rows.reduce((a, t) => a + t.amountVnd, 0)
   const map = new Map<CategoryId, number>()
@@ -520,6 +659,46 @@ export function useExpenseByCategory(month?: string): CategorySlice[] {
     () => computeExpenseByCategory(transactions, key),
     [transactions, key],
   )
+}
+
+/* ---------------- Tiền đang cho mượn ---------------- */
+
+export interface DangChoMuon {
+  /** Ứng ra trừ đã đòi về, MỌI THÁNG. 0 = đã đòi xong hết. */
+  conLai: number
+  /** Tổng đã ứng ra từ trước tới giờ — để câu chữ nói rõ gốc con số. */
+  daUng: number
+  /** Tổng đã đòi về được. */
+  daDoi: number
+}
+
+/**
+ * Tiền mình ứng ra mà nhóm chưa trả — CỘNG DỒN MỌI THÁNG, cố ý không lọc theo
+ * `activeMonth`.
+ *
+ * Đây là ngoại lệ duy nhất với quy tắc "mọi số liệu gom theo tháng" của
+ * PRODUCT.md, và nó buộc phải thế: một khoản ứng tháng 8 chưa đòi vẫn là tiền
+ * đang thiếu trong tháng 9. Lọc theo tháng sẽ làm nó biến mất khỏi màn hình
+ * đúng lúc người dùng cần nhớ nhất — mà quên chính là thứ app này chống.
+ *
+ * `conLai` âm được: đòi về nhiều hơn đã ứng (ai đó trả dư, hoặc mình quên ghi
+ * lúc ứng). Không kẹp về 0 — một số âm ở đây là tín hiệu sổ đang lệch, giấu đi
+ * thì người dùng không bao giờ biết để sửa.
+ */
+export function computeDangChoMuon(transactions: Transaction[]): DangChoMuon {
+  let daUng = 0
+  let daDoi = 0
+  for (const t of transactions) {
+    if (!laUngNhom(t)) continue
+    if (t.type === 'expense') daUng += t.amountVnd
+    else daDoi += t.amountVnd
+  }
+  return { conLai: daUng - daDoi, daUng, daDoi }
+}
+
+export function useDangChoMuon(): DangChoMuon {
+  const transactions = useExpenseStore((s) => s.transactions)
+  return useMemo(() => computeDangChoMuon(transactions), [transactions])
 }
 
 /**
@@ -564,7 +743,11 @@ export function computeCashflowSeries(
   return Array.from({ length: months }, (_, i) => {
     const d = new Date(y, m - 1 - (months - 1 - i), 1)
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-    const rows = transactions.filter((t) => monthKey(t.occurredAt) === key)
+    // Cùng quy ước với computeMonthlySummary: tiền ứng không phải thu, cũng
+    // không phải chi. Không lọc ở đây thì cột tháng đi ăn nhóm sẽ vọt lên.
+    const rows = transactions.filter(
+      (t) => monthKey(t.occurredAt) === key && !laUngNhom(t),
+    )
     return {
       month: key,
       label: `T${d.getMonth() + 1}`,
@@ -705,7 +888,11 @@ export function computeBudgetRows(
 ): CategoryBudgetRow[] {
   const spent = new Map<CategoryId, number>()
   for (const t of transactions) {
-    if (t.type !== 'expense' || monthKey(t.occurredAt) !== month) continue
+    // Tiền ứng không đốt hạn mức — đây là lý do chính tính năng chia tiền tồn
+    // tại. Ứng 400k tiền lẩu mà ăn mất 400k hạn mức Ăn uống là vô lý.
+    if (t.type !== 'expense' || monthKey(t.occurredAt) !== month || laUngNhom(t)) {
+      continue
+    }
     spent.set(t.categoryId, (spent.get(t.categoryId) ?? 0) + t.amountVnd)
   }
 
@@ -852,7 +1039,9 @@ export function computeMonthComparison(
   const spendIn = (key: string) => {
     const map = new Map<CategoryId, number>()
     for (const t of transactions) {
-      if (t.type !== 'expense' || monthKey(t.occurredAt) !== key) continue
+      if (t.type !== 'expense' || monthKey(t.occurredAt) !== key || laUngNhom(t)) {
+        continue
+      }
       map.set(t.categoryId, (map.get(t.categoryId) ?? 0) + t.amountVnd)
     }
     return map

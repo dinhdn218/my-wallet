@@ -13,12 +13,10 @@ import { DongGia, NhanNgay, groupByDay } from '@/components/transaction/dong-gia
 import { GhiNhanh } from '@/components/transaction/ghi-nhanh'
 import { TransactionEdit } from '@/components/transaction/transaction-edit'
 import { AmountSkeleton } from '@/components/ui/glass-card'
-import { formatVnd } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import {
   useCategoryLookup,
   useExpenseStore,
-  useMonthlySummary,
   useRecentTransactions,
 } from '@/store/useExpenseStore'
 
@@ -38,8 +36,11 @@ export default function TrangChinh() {
   const hasHydrated = useExpenseStore((s) => s.hasHydrated)
   const activeMonth = useExpenseStore((s) => s.activeMonth)
   const lookup = useCategoryLookup()
-  const { expense } = useMonthlySummary()
-  const rows = useRecentTransactions(40)
+  // 10, không phải 40: đây là "vừa ghi gì" để soát lại ngay sau khi gõ, còn
+  // xem cả tháng là việc của /giao-dich. Ở 40 thì phần lớn tháng lọt hết vào
+  // đây, trang này và trang giao dịch hiện y hệt nhau, chỉ khác dải lọc — mà
+  // ai chi hơn 40 khoản/tháng lại bị cắt bớt im lặng, không biết mình xem thiếu.
+  const rows = useRecentTransactions(10)
   const [editingId, setEditingId] = useState<string | null>(null)
 
   const groups = groupByDay(rows)
@@ -49,10 +50,21 @@ export default function TrangChinh() {
   return (
     <main className="flex min-h-0 flex-1 flex-col md:flex-row">
       {/* ---------- Cột ghi: trái ở desktop, dưới ở mobile ---------- */}
-      <div className="no-scrollbar mep-men order-2 flex shrink-0 flex-col overflow-y-auto bg-men-dam px-4 pt-3 pb-3 md:order-1 md:h-dvh md:w-[360px] md:overflow-y-auto md:px-7 md:py-6 xl:w-[400px] xl:px-8">
+      {/*
+        ⚠️ Cột này KHÔNG cuộn (`overflow-hidden`), chỉ khối ghi bên trong mới
+        cuộn. Trước đây cả cột cuộn, nên mở dải chia tiền là thương hiệu và
+        con số "còn tiêu được" bị kéo lên trên mép màn — hai thứ phải luôn
+        nhìn thấy, vì con số đó là câu trả lời của cả màn hình.
+        `max-h-[70dvh]` ở mobile giữ cột ghi không ăn hết chỗ của bảng giá
+        phía trên khi nó nở ra.
+      */}
+      <div className="mep-men order-2 flex max-h-[70dvh] min-h-0 shrink flex-col overflow-hidden bg-men-dam px-4 pt-3 pb-3 md:order-1 md:h-dvh md:max-h-none md:w-[360px] md:shrink-0 md:px-7 md:py-6 xl:w-[400px] xl:px-8">
         <Brand className="hidden shrink-0 md:flex" />
         <ConTieuDuoc pending={pending} className="mt-[clamp(14px,3vh,28px)] hidden shrink-0 md:flex" />
-        <GhiNhanh onPendingChange={setPending} className="md:mt-[clamp(12px,2.2vh,24px)] md:min-h-0 md:flex-1" />
+        <GhiNhanh
+          onPendingChange={setPending}
+          className="min-h-0 flex-1 md:mt-[clamp(12px,2.2vh,24px)]"
+        />
 
         <div className="mt-[clamp(8px,1.5vh,16px)] hidden shrink-0 flex-col md:flex">
           <ThemeToggle size="desktop" />
@@ -70,8 +82,13 @@ export default function TrangChinh() {
           </h1>
           <div className="flex items-center gap-3">
             <MonthPicker />
+            {/*
+              "Gần nhất", KHÔNG phải `${rows.length} khoản`: bảng này cắt ở 10
+              nên con số đó luôn đọc là "10 khoản" dù tháng có bao nhiêu — người
+              dùng sẽ tưởng cả tháng chỉ chi có ngần ấy.
+            */}
             <span className="font-mono text-[11px] tracking-[.2em] text-muted uppercase">
-              {hasHydrated ? `${rows.length} khoản` : '…'}
+              {hasHydrated ? 'Gần nhất' : '…'}
             </span>
           </div>
         </header>
@@ -112,16 +129,21 @@ export default function TrangChinh() {
           )}
         </div>
 
-        {/* Tổng cuối bảng — dòng kết sổ */}
+        {/*
+          Lối sang bảng đầy đủ, thay cho dòng kết sổ "Chi tháng" trước đây: con
+          số đó đã nằm ở ConTieuDuoc phía trên rồi — nguyên văn khi chưa đặt hạn
+          mức, hoặc ở dòng "Đã tiêu X trên Y" khi đã đặt (cũng chỉ desktop, đúng
+          cùng điều kiện hiện của khối này). Danh sách ở đây chỉ 10 khoản gần
+          nhất nên phải nói rõ còn chỗ xem hết.
+        */}
         {hasHydrated && rows.length > 0 && (
-          <div className="mt-6 hidden shrink-0 items-baseline gap-3 border-t-2 border-foreground pt-4 pb-2 md:flex">
-            <span className="font-mono text-[11px] tracking-[.2em] text-muted uppercase">
-              Chi tháng {thang}
-            </span>
-            <span aria-hidden className="duong-cham mb-[3px] h-px flex-1 self-center" />
-            <span className="text-[27px] font-semibold tracking-[-.025em] tabular-nums">
-              {formatVnd(expense)}
-            </span>
+          <div className="mt-5 hidden shrink-0 border-t border-men-vien pt-3 pb-2 md:block">
+            <Link
+              href="/giao-dich"
+              className="text-[15px] font-semibold text-accent underline underline-offset-4"
+            >
+              Xem tất cả giao dịch →
+            </Link>
           </div>
         )}
       </div>

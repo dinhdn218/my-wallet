@@ -2,7 +2,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Category, CategoryId } from '@/lib/categories'
 import type { Budgets } from '@/lib/seed-data'
 import type { BalanceMark } from '@/types/balance'
-import type { NewTransaction, Transaction } from '@/types/transaction'
+import type {
+  NewTransaction,
+  Transaction,
+  TransactionPatch,
+} from '@/types/transaction'
 import {
   rowToBalanceMark,
   rowToCategory,
@@ -98,9 +102,10 @@ export async function insertTransaction(
 export async function updateTransactionRow(
   supabase: SupabaseClient,
   id: string,
-  patch: Partial<NewTransaction>,
+  patch: TransactionPatch,
 ): Promise<Transaction> {
   // Chỉ gửi cột thực sự đổi: gửi undefined sẽ ghi đè thành null.
+  // Riêng `note`: null là CỐ Ý xoá tên, khác undefined là "không đụng tới".
   const row: Record<string, unknown> = {}
   if (patch.type !== undefined) row.type = patch.type
   if (patch.amountVnd !== undefined) row.amount_vnd = patch.amountVnd
@@ -121,6 +126,36 @@ export async function updateTransactionRow(
 
 export async function deleteTransaction(supabase: SupabaseClient, id: string) {
   const { error } = await supabase.from('transactions').delete().eq('id', id)
+  if (error) throw error
+}
+
+/**
+ * Tạo một danh mục nếu nó chưa có, không đụng tới danh mục đã tồn tại.
+ *
+ * ⚠️ `ignoreDuplicates: true` là điểm mấu chốt, không phải tinh chỉnh: hàm này
+ * dùng để dựng danh mục HỆ THỐNG ("Ứng cho nhóm") ngay trước khi ghi giao dịch
+ * đầu tiên vào nó. Một upsert thường sẽ ghi đè nhãn và màu mỗi lần chia tiền —
+ * cuốn phăng mọi thay đổi người dùng từng làm, âm thầm, mỗi lần đi ăn nhóm.
+ *
+ * sort_order để cuối danh sách: đây không phải danh mục người dùng chọn hằng
+ * ngày, nó không nên chen lên trước Ăn uống ở màn Danh mục.
+ */
+export async function insertCategoryIfMissing(
+  supabase: SupabaseClient,
+  userId: string,
+  category: Category,
+  sortOrder = 100,
+) {
+  const { error } = await supabase.from('categories').upsert(
+    {
+      user_id: userId,
+      id: category.id,
+      label: category.label,
+      color: category.color,
+      sort_order: sortOrder,
+    },
+    { onConflict: 'user_id,id', ignoreDuplicates: true },
+  )
   if (error) throw error
 }
 
