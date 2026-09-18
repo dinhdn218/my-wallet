@@ -87,3 +87,26 @@ export const EXPENSE_CATEGORY_IDS: CategoryId[] = [
  * và đó là cách duy nhất để sổ nợ trừ dần về 0.
  */
 export const INCOME_CATEGORY_IDS: CategoryId[] = [UNG_NHOM_ID, 'luong', 'khac']
+
+/**
+ * Danh mục chọn được khi SỬA một giao dịch đã có.
+ *
+ * Khác danh sách lúc ghi mới ở đúng một chỗ: luôn kèm danh mục hiện tại của
+ * giao dịch, kể cả khi nó không nằm trong danh sách chọn tay.
+ *
+ * Vì sao cần: khoản ứng do "Chia tiền" sinh ra là type `expense` mang
+ * UNG_NHOM_ID, mà id này cố ý vắng mặt ở EXPENSE_CATEGORY_IDS. Thiếu nó trong
+ * options thì ô Danh mục không tra được nhãn và in thẳng id "ung-nhom" ra màn
+ * hình — đồng thời người dùng lỡ mở danh sách ra là không còn đường chọn lại.
+ *
+ * Không tự dựng mục từ id: danh mục bị xoá khỏi store thì thà thiếu một dòng
+ * còn hơn bày ra một dòng không màu không tên.
+ */
+export function categoryOptionsForEdit(
+  type: 'income' | 'expense',
+  currentId: CategoryId,
+  list: Category[],
+): Category[] {
+  const ids = type === 'income' ? INCOME_CATEGORY_IDS : EXPENSE_CATEGORY_IDS
+  return list.filter((c) => ids.includes(c.id) || c.id === currentId)
+}

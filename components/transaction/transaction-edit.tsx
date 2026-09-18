@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
-import { EXPENSE_CATEGORY_IDS, INCOME_CATEGORY_IDS } from '@/lib/categories'
+import { categoryOptionsForEdit } from '@/lib/categories'
 import { formatVnd, parseAmountVnd } from '@/lib/format'
 import { useMediaQuery } from '@/lib/use-media-query'
 import { cn } from '@/lib/utils'
@@ -131,9 +131,14 @@ function EditBody({
   const parsedAmount = parseAmountVnd(amountRaw)
   const saving = status === 'saving'
   const canSave = Boolean(parsedAmount && categoryId && occurredAt) && !saving
-  const categoryIds =
-    transaction.type === 'income' ? INCOME_CATEGORY_IDS : EXPENSE_CATEGORY_IDS
-  const options = categories.filter((c) => categoryIds.includes(c.id))
+  // Neo vào transaction.categoryId chứ không phải nháp `categoryId`: danh mục
+  // gốc phải ở lại danh sách kể cả sau khi người dùng đã bấm sang mục khác,
+  // nếu không thì đổi nhầm một khoản ứng là mất đường quay lại.
+  const options = categoryOptionsForEdit(
+    transaction.type,
+    transaction.categoryId,
+    categories,
+  )
 
   async function save() {
     if (!parsedAmount || !transaction) return

@@ -150,3 +150,22 @@ test('hai lối phụ giữ nguyên thứ tự khi mở ghi chú', async ({ page
     .boundingBox()
   expect(box!.y + box!.height).toBeLessThanOrEqual(cuon!.y + cuon!.height + 1)
 })
+
+test('sửa khoản ứng: ô Danh mục đọc được, không lòi id ra', async ({ page }) => {
+  await ghiBuaNhom(page, { tong: '500k', soNguoi: 5 })
+
+  await page.goto('/giao-dich')
+  const table = page.getByTestId('tx-table')
+  // Dòng 400.000đ là phần ứng; bấm vào để mở tấm sửa.
+  await table.getByText('400.000đ').first().click()
+
+  // Danh mục của khoản ứng cố ý vắng mặt ở dải thẻ giá, nhưng tấm SỬA vẫn
+  // phải gọi đúng tên nó — và phải cho chọn lại, nếu không đổi nhầm là mất
+  // đường quay về.
+  const tamSua = page.getByRole('dialog')
+  await expect(tamSua.getByText('Ứng cho nhóm')).toBeVisible()
+  await expect(tamSua.getByText('ung-nhom')).toHaveCount(0)
+
+  await tamSua.getByRole('combobox').click()
+  await expect(page.getByRole('option', { name: 'Ứng cho nhóm' })).toBeVisible()
+})
