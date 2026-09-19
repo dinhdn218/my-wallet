@@ -48,3 +48,28 @@ test('bấm một dòng ở danh sách giao dịch mở được form sửa', as
 
   await expect(page.getByLabel('Tên giao dịch')).toBeVisible()
 })
+
+/*
+ * Ô số ở màn ghi KHÔNG được gọi bàn phím của hệ thống: bàn phím riêng luôn hiện
+ * sẵn ngay dưới nó, hai cái chồng nhau thì che mất nút GHI.
+ *
+ * Trước đây ô mang inputMode="decimal", và chỉ cần bấm một phím trên dải là bàn
+ * phím hệ thống nhảy lên — BanPhimSo gọi `focusRef.focus()` sau mỗi lần bấm để
+ * trả con trỏ về ô, mà một `focus()` chạy trong cú chạm của người dùng là đủ để
+ * hệ điều hành kéo bàn phím ra.
+ *
+ * Playwright không dựng được bàn phím ảo của hệ điều hành, nên test này canh
+ * đúng thuộc tính quyết định hành vi đó. Bàn phím có thật sự im hay không vẫn
+ * phải thử trên máy thật.
+ */
+test('ô số ở màn ghi không gọi bàn phím hệ thống', async ({ page }) => {
+  await page.goto('/')
+
+  const o = page.getByTestId('o-nhap-so')
+  await expect(o).toHaveAttribute('inputmode', 'none')
+
+  // Bàn phím riêng vẫn phải ghi được vào đúng ô đó.
+  await page.getByRole('button', { name: '3', exact: true }).click()
+  await page.getByRole('button', { name: 'Thêm nghìn' }).click()
+  await expect(o).toHaveValue('3k')
+})

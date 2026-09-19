@@ -266,9 +266,19 @@ export function GhiNhanh({
             màn hình ghi vào đúng state này, nên hai lối nhập không bao giờ
             lệch nhau.
 
-            inputMode="decimal" để điện thoại bật bàn phím số của hệ thống khi
-            người dùng chạm thẳng vào ô — còn bàn phím riêng bên dưới vẫn là
-            lối chính, nhanh hơn vì có k/tr.
+            inputMode="none": trên điện thoại KHÔNG bao giờ gọi bàn phím của hệ
+            thống, dù chạm thẳng vào ô hay bấm phím ở dải bên dưới. Bàn phím
+            riêng là lối nhập duy nhất ở đó, và nó nhanh hơn nhờ hai phím k/tr.
+
+            Trước đây là "decimal", và nó bật bàn phím hệ thống ngay cả khi người
+            dùng chỉ bấm phím trên màn hình: BanPhimSo gọi `focusRef.focus()` sau
+            mỗi lần bấm để trả con trỏ về đây, mà một `focus()` chạy trong cú chạm
+            của người dùng là đủ để hệ điều hành kéo bàn phím lên. Hai bàn phím
+            chồng nhau, che mất nút GHI.
+
+            `inputMode` chỉ điều khiển bàn phím ẢO nên desktop không mất gì: gõ
+            bằng bàn phím máy, dán, mũi tên và Backspace vẫn nguyên. Vì vậy cũng
+            không cần dò thiết bị bằng media query.
           */}
             <input
               ref={oNhap}
@@ -276,7 +286,7 @@ export function GhiNhanh({
               value={raw}
               onChange={(e) => onChangeRaw(e.target.value)}
               onKeyDown={onKeyDownRaw}
-              inputMode="decimal"
+              inputMode="none"
               autoComplete="off"
               spellCheck={false}
               placeholder="0"
