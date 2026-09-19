@@ -123,3 +123,26 @@ test('xoá trắng tên giao dịch rồi lưu thì tên biến mất hẳn', as
   await page.reload()
   await expect(table(page).getByText('Cafe Highlands')).toHaveCount(0)
 })
+
+/*
+ * Lỗi thật: dải lọc chỉ dựng chip cho 4 danh mục đầu (`categories.slice(0, 4)`),
+ * nên 8 danh mục còn lại — kể cả Lương, Nhà cửa và các mục thêm sau — không có
+ * đường nào lọc tới. Chốt bằng "Nhà cửa" (thứ 5) và "Lương" (thứ 7): cả hai
+ * trước đây đều nằm ngoài lát cắt.
+ *
+ * `exact: true` là bắt buộc: mỗi dòng giao dịch cũng là một button mà tên trợ
+ * năng có chứa nhãn danh mục ("Tiền nhà tháng 9 … Nhà cửa · 10:00 …").
+ */
+test('dải lọc có chip cho mọi danh mục, không chỉ 4 cái đầu', async ({ page }) => {
+  await page.getByRole('button', { name: 'Nhà cửa', exact: true }).click()
+
+  await expect(table(page).getByText('Tiền nhà tháng 9')).toBeVisible()
+  await expect(table(page).getByText('Cafe Highlands')).toBeHidden()
+
+  // Chọn thêm danh mục thứ hai là cộng dồn, không thay thế.
+  await page.getByRole('button', { name: 'Lương', exact: true }).click()
+
+  await expect(table(page).getByText('Tiền nhà tháng 9')).toBeVisible()
+  await expect(table(page).getByText('Lương tháng 9')).toBeVisible()
+  await expect(table(page).getByText('Cafe Highlands')).toBeHidden()
+})

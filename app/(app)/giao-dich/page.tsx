@@ -54,7 +54,6 @@ export default function TransactionsPage() {
 
   const filtering = type !== 'all' || categoryIds.length > 0
   const monthNo = Number(activeMonth.split('-')[1])
-  const chipCategories = useMemo(() => categories.slice(0, 4), [categories])
 
   const toggleCategory = (id: string) =>
     setCategoryIds((prev) =>
@@ -99,7 +98,15 @@ export default function TransactionsPage() {
 
           <span className="h-6 w-px shrink-0 bg-men-vien" aria-hidden />
 
-          {chipCategories.map((category) => (
+          {/*
+            MỌI danh mục trong store, không cắt bớt. Bản trước lấy
+            `categories.slice(0, 4)`, nên từ "Nhà cửa" trở đi — gồm cả bốn mục
+            thêm sau (Tín dụng, Cầu lông, Hiếu hỉ, Freelance) lẫn "Ứng cho nhóm"
+            — không có đường nào lọc tới, dù selector vẫn lọc đúng theo id.
+            Chỗ chứa đã lo phần dài: mobile cuộn ngang, desktop `md:flex-wrap`
+            xuống dòng.
+          */}
+          {categories.map((category) => (
             <FilterChip
               key={category.id}
               active={categoryIds.includes(category.id)}
