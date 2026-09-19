@@ -1,7 +1,7 @@
 'use client'
 
 import useEmblaCarousel from 'embla-carousel-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TheGia, ThanhTreo } from '@/components/ui/glass-card'
 import { formatVndShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -18,9 +18,17 @@ import type { Category } from '@/lib/categories'
  * các thẻ phải treo trên dây kẽm và giữ đúng ngôn ngữ tấm bảng. Chỉ lấy đúng
  * phần máy kéo.
  *
- * ⚠️ Mỗi thẻ là một NÚT chọn danh mục. Embla không tự phân biệt kéo với bấm,
- * nên vẫn phải tự chặn click sau một cú kéo — nếu không, kéo dải xong sẽ chọn
- * nhầm danh mục ở chỗ thả tay.
+ * ⚠️ Mỗi thẻ là một NÚT chọn danh mục, và Embla 8 TỰ lo việc không cho một cú
+ * kéo biến thành cú chọn: nó bật cờ `preventClick` khi ngón tay đi quá
+ * `dragThreshold` (10px) rồi chặn bằng listener `click` pha capture ngay trên
+ * node gốc này. KHÔNG dựng thêm lớp chặn nữa.
+ *
+ * Đã từng có một lớp như vậy ở đây và nó nuốt click thật: cờ được bật bằng sự
+ * kiện `scroll`, mà `scroll` nổ ở mọi khung hình có chuyển động — kể cả cú
+ * nhích 1px dưới ngưỡng, tức là một cú BẤM — còn lệnh tắt cờ lại nằm trong
+ * setTimeout, chạy sau khi `click` đã bay qua. Bấm vài lần là trúng một lần
+ * không đổi được danh mục. Quán tính của `dragFree` còn bật lại cờ sau khi đã
+ * tắt, khoá luôn lối chọn bằng bàn phím cho tới lần chạm kế tiếp.
  */
 export function DaiTheGia({
   ids,
@@ -50,7 +58,6 @@ export function DaiTheGia({
     watchDrag: true,
   })
 
-  const daKeo = useRef(false)
   const [coTheKeo, setCoTheKeo] = useState(false)
 
   // Chỉ hiện con trỏ "nắm" khi dải THỰC SỰ tràn; ít danh mục thì kéo vô nghĩa.
@@ -64,39 +71,11 @@ export function DaiTheGia({
     }
   }, [emblaApi])
 
-  // Đánh dấu đã kéo để chặn cú click ngay sau đó.
-  useEffect(() => {
-    if (!emblaApi) return
-    const batDau = () => {
-      daKeo.current = true
-    }
-    const ketThuc = () => {
-      // Nhả cờ ở khung hình sau: click nổ ra ngay sau pointerup.
-      setTimeout(() => {
-        daKeo.current = false
-      }, 0)
-    }
-    emblaApi.on('pointerDown', () => {
-      daKeo.current = false
-    })
-    emblaApi.on('scroll', batDau).on('pointerUp', ketThuc)
-    return () => {
-      emblaApi.off('scroll', batDau).off('pointerUp', ketThuc)
-    }
-  }, [emblaApi])
-
-  const chan = useCallback((e: React.MouseEvent) => {
-    if (!daKeo.current) return
-    e.preventDefault()
-    e.stopPropagation()
-  }, [])
-
   return (
     <div className={cn('shrink-0', className)}>
       <ThanhTreo />
       <div
         ref={emblaRef}
-        onClickCapture={chan}
         className={cn(
           '-mx-4 overflow-hidden md:-mx-7 xl:-mx-8',
           coTheKeo && 'cursor-grab active:cursor-grabbing',
