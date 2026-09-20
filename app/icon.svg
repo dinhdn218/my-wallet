@@ -1,16 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <!--
-    Favicon. Cùng hình với components/layout/logo.tsx nhưng màu HARD-CODE:
-    file tĩnh không đọc được biến CSS của app.
+    Favicon và nguồn gốc của mọi icon app (apple-icon, icon manifest đều kết
+    xuất từ chính file này bằng sharp — xem scripts/tao-icon.mjs).
+
+    Cùng hình với components/layout/logo.tsx nhưng màu HARD-CODE: file tĩnh
+    không đọc được biến CSS của app.
+
+    TRÀN MÉP, không còn viền men 2px như bản trước. Viền đó sinh ra để logo dán
+    lên nền lạ vẫn có mép, nhưng icon app thì hệ điều hành tự bo góc và tự đặt
+    lên nền của nó, nên viền chỉ làm ô vàng bé lại và trông như bị đóng khung.
+    Bản CÓ viền vẫn còn, để dán lên nền lạ: public/brand/logo.svg.
 
     Nền men xanh đặc chứ không trong suốt — tab trình duyệt có thể sáng hoặc
-    tối, logo trong suốt sẽ mất hình ở một trong hai trường hợp. Viền men 2px
-    quanh ô vàng cũng chính là mép tấm bảng.
+    tối, logo trong suốt sẽ mất hình ở một trong hai trường hợp.
 
     Chữ V là phần KHOÉT THỦNG khỏi ô vàng (fill-rule evenodd), không phải hình
     xanh vẽ chồng lên: hai hình chồng nhau sẽ hở viền khi khử răng cưa.
   -->
   <rect width="32" height="32" fill="#0f4c3a"/>
   <path fill="#edc948" fill-rule="evenodd"
-        d="M2 2h28v28H2V2zm7 6h5l2 11 2-11h5l-4.5 16h-5L9 8z"/>
+        d="M0 0h32v32H0V0zm9 8h5l2 11 2-11h5l-4.5 16h-5L9 8z"/>
 </svg>

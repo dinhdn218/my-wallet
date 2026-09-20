@@ -14,6 +14,7 @@ Hai màu duy nhất, không dùng màu nào khác:
 | File | Khi nào |
 |---|---|
 | `logo.svg` | **Mặc định.** Có viền men bao quanh, nền đặc — dán lên đâu cũng đọc được |
+| `logo-vuong-{192,512}.png` | Icon manifest. **Sinh tự động**, đừng sửa tay — xem dưới |
 | `logo-vuong.svg` | Chỉ ô vuông vàng, không viền. Khi bạn tự kiểm soát nền |
 | `logo-{16…1024}.png` | Khi chỗ nhận không chấp nhận SVG |
 | `wordmark-men.png` | Logo + tên, chữ men xanh — cho **nền sáng**. Nền trong suốt |
@@ -22,17 +23,34 @@ Hai màu duy nhất, không dùng màu nào khác:
 Ưu tiên SVG bất cứ khi nào được: nó là bản gốc, phóng to bao nhiêu cũng nét.
 PNG chỉ là bản kết xuất.
 
-## Không phải favicon
+## Icon của app nằm ở chỗ khác
 
-Favicon của app là [`app/icon.svg`](../../app/icon.svg), file riêng — Next đọc
-theo quy ước tên file nên không lấy từ thư mục này được. Hai file cùng một
-hình; **sửa logo thì phải sửa cả hai**, cộng với
-[`components/layout/logo.tsx`](../../components/layout/logo.tsx) là bản dùng
-biến CSS để đi theo chế độ sáng/tối.
+Next đọc icon theo quy ước tên file nên không lấy từ thư mục này được. Bản
+gốc của mọi icon app là [`app/icon.svg`](../../app/icon.svg).
 
-Ba nơi cùng giữ một hình là chấp nhận được vì hình này gần như không đổi, và
-gộp lại sẽ tốn hơn: favicon phải là file tĩnh màu cứng, còn logo trong app
-phải đọc được biến CSS.
+| File | Ai đọc |
+|---|---|
+| `app/icon.svg` | Favicon tab trình duyệt. **Bản gốc** của hai dòng dưới |
+| `app/apple-icon.png` | iOS, khi thêm vào màn hình chính |
+| `logo-vuong-{192,512}.png` | Android, qua [`app/manifest.ts`](../../app/manifest.ts) |
+
+Ba file sau là BẢN DẪN XUẤT của `app/icon.svg`. Sửa logo xong phải chạy:
+
+```bash
+node scripts/tao-icon.mjs
+```
+
+Quên chạy thì favicon một đằng, icon trên màn hình chính một nẻo — mà không
+có gì báo, vì hai thứ đó không bao giờ hiện cạnh nhau.
+
+**`app/icon.svg` TRÀN MÉP, `logo.svg` thì CÓ VIỀN** — cố ý khác nhau, không
+phải quên đồng bộ. Icon app được hệ điều hành tự bo góc và tự đặt lên nền của
+nó, thêm viền chỉ làm ô vàng bé lại như bị đóng khung; còn `logo.svg` dùng để
+dán lên nền lạ nên cần mép của riêng nó.
+
+Bản thứ ba là [`components/layout/logo.tsx`](../../components/layout/logo.tsx)
+— cùng hình tràn mép với `app/icon.svg`, nhưng dùng biến CSS để đi theo chế độ
+sáng/tối. Không gộp được với file tĩnh màu cứng.
 
 ## Chữ V khoét thủng hay vẽ đặc
 
