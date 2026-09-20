@@ -100,7 +100,12 @@ export function BanPhimSo({
           }
           className={cn(
             'flex items-center justify-center bg-men-phim',
-            thap ? 'h-[clamp(44px,5vh,48px)]' : 'h-[clamp(44px,6.2vh,58px)]',
+            // Trần phím hạ ở mobile (5.2vh) vì cột ghi và bảng giá chia nhau
+            // một màn; desktop có nguyên chiều cao cột nên giữ 6.2vh. Sàn 44px
+            // không đổi ở đâu cả — đó là ngưỡng vùng chạm, không phải thẩm mỹ.
+            thap
+              ? 'h-[clamp(44px,5vh,48px)]'
+              : 'h-[clamp(44px,5.2vh,50px)] md:h-[clamp(44px,6.2vh,58px)]',
             'transition-[filter] duration-[120ms] hover:brightness-110 active:brightness-95',
             phim.loai === 'donvi'
               ? 'text-[19px] font-semibold text-accent'

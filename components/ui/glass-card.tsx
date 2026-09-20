@@ -84,7 +84,12 @@ export function TheGia({
       type="button"
       aria-pressed={chon}
       className={cn(
-        'relative mt-3 flex shrink-0 flex-col px-3 pt-2.5 pb-3 text-left',
+        // Thẻ nhỏ lại ở mobile — cột ghi và bảng giá chia nhau một màn ở đó,
+        // còn desktop có nguyên chiều cao cột nên giữ khổ cũ. Dòng số tiền
+        // tháng Ở LẠI: nó là lý do dải này là BẢNG GIÁ chứ không phải một dãy
+        // nút chọn, chỉ co chữ chứ không bỏ.
+        'relative mt-2.5 flex shrink-0 flex-col px-2.5 pt-2 pb-2.5 text-left',
+        'md:mt-3 md:px-3 md:pt-2.5 md:pb-3',
         'transition-[filter] duration-[120ms] hover:brightness-[1.04]',
         chon ? 'bg-accent text-accent-foreground' : 'bg-the text-the-muc',
         className,
@@ -94,7 +99,7 @@ export function TheGia({
       {/* dây kẽm nối lên thanh treo */}
       <span
         aria-hidden
-        className="absolute -top-3 left-1/2 h-3 w-px bg-men-vien"
+        className="absolute -top-2.5 left-1/2 h-2.5 w-px bg-men-vien md:-top-3 md:h-3"
       />
       <span className="flex items-center gap-1.5">
         {mau && (
@@ -104,10 +109,10 @@ export function TheGia({
             style={{ background: mau }}
           />
         )}
-        <span className="text-[15px] leading-tight font-normal">{ten}</span>
+        <span className="text-[13px] leading-tight font-normal md:text-[15px]">{ten}</span>
       </span>
       {gia && (
-        <span className="mt-0.5 text-[19px] font-semibold tabular-nums">
+        <span className="mt-0.5 text-[16px] font-semibold tabular-nums md:text-[19px]">
           {gia}
         </span>
       )}

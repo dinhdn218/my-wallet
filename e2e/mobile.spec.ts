@@ -73,3 +73,22 @@ test('ô số ở màn ghi không gọi bàn phím hệ thống', async ({ page 
   await page.getByRole('button', { name: 'Thêm nghìn' }).click()
   await expect(o).toHaveValue('3k')
 })
+
+/*
+ * Nút THU là ô thứ 16 của lưới bàn phím, nhưng chiều cao của nó nằm trong
+ * ghi-nhanh.tsx còn chiều cao phím số nằm trong ban-phim-so.tsx — hai chuỗi
+ * clamp giống hệt nhau ở hai file. Sửa một bên quên bên kia là lưới gãy ngay,
+ * và không có gì báo.
+ *
+ * Kiểm ở khổ mobile vì đó là nơi hai giá trị vừa được hạ xuống.
+ */
+test('nút THU cao đúng bằng phím số', async ({ page }) => {
+  await page.goto('/')
+
+  const phim = await page
+    .getByRole('button', { name: '7', exact: true })
+    .boundingBox()
+  const thu = await page.getByRole('button', { name: 'THU' }).boundingBox()
+
+  expect(Math.abs(phim!.height - thu!.height)).toBeLessThan(2)
+})

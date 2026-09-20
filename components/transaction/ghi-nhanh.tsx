@@ -327,7 +327,7 @@ export function GhiNhanh({
               // lưới bàn phím gãy ngay.
               chatCho
                 ? 'h-[clamp(44px,5vh,48px)]'
-                : 'h-[clamp(44px,6.2vh,58px)]',
+                : 'h-[clamp(44px,5.2vh,50px)] md:h-[clamp(44px,6.2vh,58px)]',
               'transition-[filter] duration-[120ms] hover:brightness-110',
               type === 'income'
                 ? 'bg-accent text-accent-foreground'
