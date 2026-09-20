@@ -72,7 +72,14 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // Không có matcher thì proxy chạy cho MỌI request, kể cả _next/static và ảnh
   // — chặn nhầm cả CSS/JS. Loại trừ chúng ra.
+  //
+  // ⚠️ `.webmanifest` PHẢI nằm trong danh sách này. Chrome tải manifest bằng
+  // request KHÔNG kèm cookie (mặc định `credentials: omit`), nên proxy luôn
+  // thấy "chưa đăng nhập" và đá sang /dang-nhap — kể cả khi người dùng đang
+  // đăng nhập. Chrome nhận về HTML thay vì JSON, không đọc nổi manifest, rồi
+  // báo "Không thể cài đặt ứng dụng này". Phía app không có lỗi nào hiện ra,
+  // nên chỗ này rất dễ tìm nhầm sang manifest.ts.
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|webmanifest)$).*)',
   ],
 }
