@@ -55,10 +55,12 @@ export default function TrangChinh() {
         cuộn. Trước đây cả cột cuộn, nên mở dải chia tiền là thương hiệu và
         con số "còn tiêu được" bị kéo lên trên mép màn — hai thứ phải luôn
         nhìn thấy, vì con số đó là câu trả lời của cả màn hình.
-        `max-h-[70dvh]` ở mobile giữ cột ghi không ăn hết chỗ của bảng giá
-        phía trên khi nó nở ra.
+        Ở mobile cột này ăn hết phần còn lại của màn (`flex-1`): bảng giá đã
+        ẩn ở khổ đó nên không còn ai tranh chỗ nữa. Trần `max-h-[70dvh]` cũ đã
+        gỡ — nó sinh ra để chừa chỗ cho đúng cái bảng giá vừa ẩn, giữ lại thì
+        chỉ để lại một khoảng trống giữa con số và khối ghi.
       */}
-      <div className="mep-men order-2 flex max-h-[70dvh] min-h-0 shrink flex-col overflow-hidden bg-men-dam px-4 pt-3 pb-3 md:order-1 md:h-dvh md:max-h-none md:w-[360px] md:shrink-0 md:px-7 md:py-6 xl:w-[400px] xl:px-8">
+      <div className="mep-men order-2 flex min-h-0 flex-1 flex-col overflow-hidden bg-men-dam px-4 pt-3 pb-3 md:order-1 md:h-dvh md:w-[360px] md:flex-none md:shrink-0 md:px-7 md:py-6 xl:w-[400px] xl:px-8">
         <Brand className="hidden shrink-0 md:flex" />
         <ConTieuDuoc pending={pending} className="mt-[clamp(14px,3vh,28px)] hidden shrink-0 md:flex" />
         <GhiNhanh
@@ -72,7 +74,12 @@ export default function TrangChinh() {
       </div>
 
       {/* ---------- Cột bảng giá: phải ở desktop, trên ở mobile ---------- */}
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col px-4 pt-3 md:order-2 md:px-8 md:pt-8 md:pb-8">
+      {/*
+        Ở mobile cột này chỉ còn con số dẫn đầu nên cao đúng bằng nội dung
+        (`flex-none`); phần dư thuộc về cột ghi. Desktop vẫn `md:flex-1` vì ở
+        đó nó là cột bảng giá và phải chiếm hết chỗ trống.
+      */}
+      <div className="flex min-h-0 min-w-0 flex-none flex-col px-4 pt-3 md:order-2 md:flex-1 md:px-8 md:pt-8 md:pb-8">
         {/* Con số dẫn đầu — mobile hiện ở đây, desktop đã có ở cột trái */}
         <ConTieuDuoc compact pending={pending} className="md:hidden" />
 
@@ -97,8 +104,20 @@ export default function TrangChinh() {
 
         <div className="mt-5 hidden h-px bg-men-vien md:block" />
 
-        {/* Bảng giá theo ngày — vùng cuộn riêng, để dòng kết sổ luôn ở đáy */}
-        <div className="no-scrollbar mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto md:mt-2">
+        {/*
+          Bảng giá theo ngày — vùng cuộn riêng, để dòng kết sổ luôn ở đáy.
+
+          ẨN Ở MOBILE. Một màn điện thoại không đủ cho cả việc ghi lẫn việc
+          xem: chia đôi thì khối ghi bị bóp mà danh sách cũng chỉ hiện nổi một
+          dòng rưỡi, tức là hỏng cả hai. PRODUCT.md tả tình huống mobile là
+          "đứng ở quán, ghi một khoản trong vài giây rồi đóng", còn "ngồi xem
+          lại" là tình huống desktop — nên ở đây nhường hết chỗ cho việc ghi.
+
+          Danh sách không mất đi đâu: thanh tab dưới có sẵn mục "Giao dịch".
+          Cũng vì vậy mà KHÔNG thêm lối "Xem tất cả giao dịch →" cho mobile —
+          nó sẽ là cái nút thứ hai dẫn tới đúng chỗ cái tab đang dẫn tới.
+        */}
+        <div className="no-scrollbar mt-5 hidden min-h-0 flex-1 flex-col overflow-y-auto md:mt-2 md:flex">
           {!hasHydrated ? (
             <div className="flex flex-col gap-3 pt-2">
               {[0, 1, 2, 3, 4].map((i) => (
